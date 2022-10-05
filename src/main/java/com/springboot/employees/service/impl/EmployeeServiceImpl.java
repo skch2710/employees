@@ -1,4 +1,4 @@
-package com.springboot.employees.service;
+package com.springboot.employees.service.impl;
 
 import java.util.List;
 
@@ -21,6 +21,7 @@ import com.springboot.employees.mapper.ObjectMapper;
 import com.springboot.employees.model.Employee;
 import com.springboot.employees.model.EmployeeDetails;
 import com.springboot.employees.model.Result;
+import com.springboot.employees.service.EmployeeService;
 import com.springboot.employees.specs.GenericSpecification;
 
 @Service
