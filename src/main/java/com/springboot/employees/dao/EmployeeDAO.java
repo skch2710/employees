@@ -24,7 +24,7 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	@Query(value = "SELECT * FROM employee WHERE email_id LIKE %:mailchech%", nativeQuery = true)
 	List<Employee> mailChech(@Param("mailchech") String mailchech);
 
-	Page<Employee> findAll(Pageable pageable);
+//	Page<Employee> findAll(Pageable pageable);
 
 	Page<Employee> findAll(Specification<Employee> spec, Pageable pageable);
 

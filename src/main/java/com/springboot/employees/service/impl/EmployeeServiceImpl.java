@@ -1,12 +1,11 @@
 package com.springboot.employees.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import com.springboot.employees.common.ConstantsEnum;
 import com.springboot.employees.dao.EmployeeDAO;
 import com.springboot.employees.dto.EmployeeDTO;
 import com.springboot.employees.dto.EmployeeSearch;
-import com.springboot.employees.dto.Pagination;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
 import com.springboot.employees.exception.CustomException;
@@ -25,7 +23,10 @@ import com.springboot.employees.model.EmployeeDetails;
 import com.springboot.employees.service.EmployeeService;
 import com.springboot.employees.specs.GenericSpecification;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired
@@ -61,7 +62,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				result.setStatusCode(HttpStatus.NOT_FOUND.value());
 				result.setErrorMessage("Id not Found.");
 			} else {
-				System.out.println(ConstantsEnum.SATHISH+" "+ConstantsEnum.KUMAR+" : \n"+employeeDTO);
+				System.out.println(ConstantsEnum.SATHISH + " " + ConstantsEnum.KUMAR + " : \n" + employeeDTO);
 				System.out.println(Constants.SATHISH_KUMAR);
 				result.setData(employeeDTO);
 				result.setStatusCode(HttpStatus.OK.value());
@@ -233,44 +234,117 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return result;
 	}
 
-	@Override
-	public Result findAll(Pagination pagination) {
+//	@Override
+//	public Result findAll(Pagination pagination) {
+//
+//		Result result = new Result();
+//
+//		try {
+//
+//			if (pagination.getSortBy() == null || "".equalsIgnoreCase(pagination.getSortBy())) {
+//				pagination.setSortBy("empId");
+//			}
+//
+//			Sort sort = null;
+//
+//			if (pagination.getSortOrder() == null || "".equalsIgnoreCase(pagination.getSortOrder())
+//					|| pagination.getSortOrder().equalsIgnoreCase("asc")) {
+//				sort = Sort.by(pagination.getSortBy()).ascending();
+//			} else if (pagination.getSortOrder().equalsIgnoreCase("desc")) {
+//				sort = Sort.by(pagination.getSortBy()).descending();
+//			}
+//
+//			Pageable paging = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
+//
+//			Page<Employee> employees = employeeDAO.findAll(paging);
+//
+//			if (employees.hasContent()) {
+//
+//				SearchResult<EmployeeDTO> searchResult = GenericSpecification.getPaginationDetails(employees,
+//						EmployeeDTO.class);
+//
+//				searchResult.setContent(MAPPER.fromEmployeeModel(employees.getContent()));
+//
+//				result.setData(searchResult);
+//				result.setStatusCode(HttpStatus.OK.value());
+//				result.setSuccessMessage("getting success.");
+//			} else {
+//				result.setStatusCode(HttpStatus.NOT_FOUND.value());
+//				result.setErrorMessage("fetch failed No records found.");
+//			}
+//		} catch (Exception e) {
+//			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//
+//		return result;
+//	}
 
-		Result result = new Result();
+	/**
+	 * Employee Data based on search field.
+	 * ( String - contains , Id - = )
+	 * 
+	 * @param employeeSearch
+	 * 
+	 * @return Employees Data
+	 */
+	@Override
+	public Result filterSearch(EmployeeSearch employeeSearch) {
+		Result result = null;
 
 		try {
+			Map<String, Object> filters = null;
+			Map<String, Map<String, Object>> dynamicFilters = new HashMap<>();
 
-			if (pagination.getSortBy() == null || "".equalsIgnoreCase(pagination.getSortBy())) {
-				pagination.setSortBy("empId");
+			if (employeeSearch.getSortBy() == null || "".equalsIgnoreCase(employeeSearch.getSortBy())) {
+				employeeSearch.setSortBy(Constants.FIRST_NAME);
 			}
 
-			Sort sort = null;
-
-			if (pagination.getSortOrder() == null || "".equalsIgnoreCase(pagination.getSortOrder())
-					|| pagination.getSortOrder().equalsIgnoreCase("asc")) {
-				sort = Sort.by(pagination.getSortBy()).ascending();
-			} else if (pagination.getSortOrder().equalsIgnoreCase("desc")) {
-				sort = Sort.by(pagination.getSortBy()).descending();
+			if (employeeSearch.getColumnFilters() != null) {
+				GenericSpecification.dynamicFilters(employeeSearch.getColumnFilters(), dynamicFilters);
 			}
 
-			Pageable paging = PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
+			if (employeeSearch.getFirstName() != null) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.LIKE, employeeSearch.getFirstName());
+				dynamicFilters.put(Constants.FIRST_NAME, filters);
+			}
+//			if (employeeSearch.getEmpDetailsId() != null && employeeSearch.getEmpDetailsId().size() > 0) {
+//				filters = new HashMap<String, Object>();
+//				filters.put(Constants.IN, 0);
+//				dynamicFilters.put(Constants.EMP_ID, filters);
+//			}
+			if (employeeSearch.getEmpId() != null) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.EQUALS, employeeSearch.getEmpId());
+				dynamicFilters.put(Constants.EMP_ID, filters);
+			}
+			if (employeeSearch.getEmailId() != null) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.LIKE, employeeSearch.getEmailId());
+				dynamicFilters.put(Constants.EMAIL_ID, filters);
+			}
+			result = new Result();
+			if (!employeeSearch.isExport()) {
 
-			Page<Employee> employees = employeeDAO.findAll(paging);
-
-			if (employees.hasContent()) {
-
-				SearchResult<EmployeeDTO> searchResult = GenericSpecification.getPaginationDetails(employees,
+				Page<Employee> pageResult = employeeDAO.findAll(GenericSpecification.getSpecification(dynamicFilters),
+						GenericSpecification.getPagination(employeeSearch));
+				SearchResult<EmployeeDTO> searchResult = GenericSpecification.getPaginationDetails(pageResult,
 						EmployeeDTO.class);
-
-				searchResult.setContent(MAPPER.fromEmployeeModel(employees.getContent()));
+				List<EmployeeDTO> employeeDTOs = MAPPER.fromEmployeeModel(pageResult.getContent());
+				searchResult.setContent(employeeDTOs);
 
 				result.setData(searchResult);
-				result.setStatusCode(HttpStatus.OK.value());
-				result.setSuccessMessage("getting success.");
+				if (employeeDTOs.size() == 0) {
+					result.setStatusCode(HttpStatus.NOT_FOUND.value());
+					result.setErrorMessage("No Result Found");
+				} else {
+					result.setStatusCode(HttpStatus.OK.value());
+					result.setSuccessMessage("Fetching all employee details based on the selected filters");
+				}
 			} else {
-				result.setStatusCode(HttpStatus.NOT_FOUND.value());
-				result.setErrorMessage("fetch failed No records found.");
+				result.setData(exportData(employeeSearch, dynamicFilters));
 			}
+
 		} catch (Exception e) {
 			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -279,14 +353,26 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	/**
-	 * Employee Data based on search field.
-	 * 
-	 * @param EmployeeSearch
-	 * 
-	 * @return Employees Data
+	 * Export data.
+	 *
+	 * @param employeeSearch the employee search
+	 * @param dynamicFilters the dynamic filters
+	 * @return the search result
 	 */
-	@Override
-	public Result filterSearch(EmployeeSearch employeeSearch) {
-		return null;
+	private SearchResult<EmployeeDTO> exportData(EmployeeSearch employeeSearch,
+			Map<String, Map<String, Object>> dynamicFilters) {
+		SearchResult<EmployeeDTO> searchResult = new SearchResult<>();
+		try {
+			List<Employee> sortResult = employeeDAO.findAll(GenericSpecification.getSpecification(dynamicFilters),
+					GenericSpecification.getSort(employeeSearch));
+
+			List<EmployeeDTO> employeeDTOs = MAPPER.fromEmployeeModel(sortResult);
+
+			searchResult.setContent(employeeDTOs);
+		} catch (Exception e) {
+			log.error("Error in exportData :: ", e);
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return searchResult;
 	}
 }

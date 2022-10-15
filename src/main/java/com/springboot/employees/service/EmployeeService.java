@@ -9,7 +9,7 @@ public interface EmployeeService {
 
 	public Result findAll();
 	
-	public Result findAll(Pagination pagination);
+//	public Result findAll(Pagination pagination);
 
 	public Result findById(Long id);
 

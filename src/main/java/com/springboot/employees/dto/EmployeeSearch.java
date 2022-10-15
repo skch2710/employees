@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmployeeSearch extends Pagination {
 
+//	private List<Long> empDetailsId;
 	private Long empId;
 	private String firstName;
-	private String lastName;
 	private String emailId;
 
 }

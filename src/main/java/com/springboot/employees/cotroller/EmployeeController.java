@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.employees.dto.EmployeeDTO;
+import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Pagination;
 import com.springboot.employees.dto.Result;
-import com.springboot.employees.model.Employee;
 import com.springboot.employees.service.EmployeeService;
-
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -34,12 +31,12 @@ public class EmployeeController {
 		Result result = employeeService.findAll();
 		return ResponseEntity.ok(result);
 	}
-	
-	@GetMapping("/findAllPagination")
-	public ResponseEntity<Result> findAll(Pagination pagination) {
-		Result result = employeeService.findAll(pagination);
-		return ResponseEntity.ok(result);
-	}
+
+//	@GetMapping("/findAllPagination")
+//	public ResponseEntity<Result> findAll(Pagination pagination) {
+//		Result result = employeeService.findAll(pagination);
+//		return ResponseEntity.ok(result);
+//	}
 
 	@GetMapping("/findById/{empid}")
 	public ResponseEntity<Result> findById(@PathVariable Long empid) {
@@ -82,16 +79,28 @@ public class EmployeeController {
 		return ResponseEntity.ok(employeeService.emailExist(emailID));
 
 	}
-	
+
 	@GetMapping("/searchByStartWith/{startWith}")
 	public ResponseEntity<?> emailexist(@PathVariable("startWith") String startWith) {
 		return ResponseEntity.ok(employeeService.findByStartWith(startWith));
 
 	}
-	
+
 	@GetMapping("/mailChech/{mailchech}")
 	public ResponseEntity<?> startWith(@PathVariable("mailchech") String mailchech) {
 		return ResponseEntity.ok(employeeService.mailChech(mailchech));
 
+	}
+
+	/**
+	 * Search Employees
+	 *
+	 * @param employeeSearch the employee search
+	 * @return the response entity
+	 */
+	@PostMapping("/filterSearch")
+	public ResponseEntity<Result> filterSearch(@RequestBody EmployeeSearch employeeSearch) {
+		Result result = employeeService.filterSearch(employeeSearch);
+		return ResponseEntity.ok(result);
 	}
 }
