@@ -1,8 +1,9 @@
 package com.springboot.employees.service;
 
 import com.springboot.employees.dto.EmployeeDTO;
+import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Pagination;
-import com.springboot.employees.model.Result;
+import com.springboot.employees.dto.Result;
 
 public interface EmployeeService {
 
@@ -31,4 +32,6 @@ public interface EmployeeService {
 	public Result findByStartWith(String firstName);
 	
 	public Result mailChech(String mailchech);
+	
+	Result filterSearch(EmployeeSearch employeeSearch);
 }

@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.springboot.employees.dao.EmployeeDetailsDAO;
 import com.springboot.employees.dto.EmployeeDetailsDTO;
+import com.springboot.employees.dto.Result;
 import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.mapper.ObjectMapper;
-import com.springboot.employees.model.Result;
+import com.springboot.employees.model.EmployeeDetails;
 import com.springboot.employees.service.EmployeeDetailsService;
 
 @Service

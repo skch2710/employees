@@ -1,6 +1,6 @@
 package com.springboot.employees.service;
 
-import com.springboot.employees.model.Result;
+import com.springboot.employees.dto.Result;
 
 public interface EmployeeDetailsService {
 	

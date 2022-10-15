@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.employees.dto.EmployeeDTO;
 import com.springboot.employees.dto.Pagination;
+import com.springboot.employees.dto.Result;
 import com.springboot.employees.model.Employee;
-import com.springboot.employees.model.Result;
 import com.springboot.employees.service.EmployeeService;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

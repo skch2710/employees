@@ -1,4 +1,4 @@
-package com.springboot.employees.model;
+package com.springboot.employees.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

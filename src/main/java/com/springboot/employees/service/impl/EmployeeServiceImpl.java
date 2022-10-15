@@ -14,13 +14,14 @@ import com.springboot.employees.common.Constants;
 import com.springboot.employees.common.ConstantsEnum;
 import com.springboot.employees.dao.EmployeeDAO;
 import com.springboot.employees.dto.EmployeeDTO;
+import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Pagination;
+import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
 import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.mapper.ObjectMapper;
 import com.springboot.employees.model.Employee;
 import com.springboot.employees.model.EmployeeDetails;
-import com.springboot.employees.model.Result;
 import com.springboot.employees.service.EmployeeService;
 import com.springboot.employees.specs.GenericSpecification;
 
@@ -275,5 +276,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Employee Data based on search field.
+	 * 
+	 * @param EmployeeSearch
+	 * 
+	 * @return Employees Data
+	 */
+	@Override
+	public Result filterSearch(EmployeeSearch employeeSearch) {
+		return null;
 	}
 }
