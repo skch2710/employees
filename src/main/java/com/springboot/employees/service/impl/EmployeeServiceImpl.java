@@ -16,6 +16,7 @@ import com.springboot.employees.dto.EmployeeDTO;
 import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
+import com.springboot.employees.email.EmailService;
 import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.mapper.ObjectMapper;
 import com.springboot.employees.model.Employee;
@@ -31,6 +32,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired
 	private EmployeeDAO employeeDAO;
+	
+	@Autowired
+	private EmailService emailService;
 
 	private ObjectMapper MAPPER = ObjectMapper.INSTANCE;
 
@@ -91,13 +95,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 			EmployeeDetails employeeDetails = new EmployeeDetails();
 			employeeDetails.setSalary(Double.valueOf(employeeDTO.getSalary()));
 			employeeDetails.setAddress(employeeDTO.getAddress());
-
 			employee.setEmployeeDetails(employeeDetails);
 
 			EmployeeDTO emps = MAPPER.fromEmployeeModel(employeeDAO.save(employee));
+			
+			Map<String, Object> model = new HashMap<>();
+			model.put("fullName", emps.getFirstName()+" "+emps.getLastName());
+			emailService.sendEmailWelcome(model, emps.getEmailId());
+			
 			result = new Result(emps);
 			result.setStatusCode(HttpStatus.OK.value());
-			result.setSuccessMessage("Data added successfully.");
+			result.setSuccessMessage("Data added successfully and Send Emaail.");
 
 		} catch (Exception e) {
 			throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);

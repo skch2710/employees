@@ -85,13 +85,13 @@ public class EmailService {
 	}
 
 	/**
-	 * Send email check.
+	 * Send email welcome.
 	 *
 	 * @param model  the model
 	 * @param toMail the to mail
 	 */
 	@Async
-	public void sendEmailCheck(Map<String, Object> model, String toMail) {
-		sendEmail(model, toMail, "mail-send.html", "This is Subject.");
+	public void sendEmailWelcome(Map<String, Object> model, String toMail) {
+		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish");
 	}
 }
