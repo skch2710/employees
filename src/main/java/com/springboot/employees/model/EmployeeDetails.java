@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name="employee_details")
+@Table(name="employee_details",schema="employees")
 //@JsonIgnoreProperties(ignoreUnknown = true, value = {"employee"})
 public class EmployeeDetails {
 	
