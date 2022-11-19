@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.employees.dto.EmployeeDTO;
+import com.springboot.employees.dto.EmployeeListSearch;
 import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Pagination;
 import com.springboot.employees.dto.Result;
@@ -86,6 +87,12 @@ public class EmployeeController {
 
 	}
 
+	/**
+	 * Search by Email
+	 * 
+	 * @param mailchech
+	 * @return Result result
+	 */
 	@GetMapping("/mailChech/{mailchech}")
 	public ResponseEntity<?> startWith(@PathVariable("mailchech") String mailchech) {
 		return ResponseEntity.ok(employeeService.mailChech(mailchech));
@@ -102,5 +109,29 @@ public class EmployeeController {
 	public ResponseEntity<Result> filterSearch(@RequestBody EmployeeSearch employeeSearch) {
 		Result result = employeeService.filterSearch(employeeSearch);
 		return ResponseEntity.ok(result);
+	}
+
+	/**
+	 * get Employees by List of Id's
+	 *
+	 * @param employeeSearch the employee search
+	 * @return the response entity
+	 */
+	@PostMapping("/listEmpById")
+	public ResponseEntity<?> getByListEmpId(@RequestBody EmployeeListSearch employeeListSearch) {
+		return ResponseEntity.ok(employeeService.findByListEmpId(employeeListSearch));
+
+	}
+
+	/**
+	 * Get By Email And FirstName.
+	 *
+	 * @param emailID and FirstName.
+	 * @return the response entity
+	 */
+	@GetMapping("/employeeDetailsBy/{emailId}/{firstName}")
+	public ResponseEntity<?> findByEmailIdAndFirstName(@PathVariable String emailId, @PathVariable String firstName) {
+		return ResponseEntity.ok(employeeService.findByEmailIdAndFirstName(emailId, firstName));
+
 	}
 }

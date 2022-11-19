@@ -13,6 +13,7 @@ import com.springboot.employees.common.Constants;
 import com.springboot.employees.common.ConstantsEnum;
 import com.springboot.employees.dao.EmployeeDAO;
 import com.springboot.employees.dto.EmployeeDTO;
+import com.springboot.employees.dto.EmployeeListSearch;
 import com.springboot.employees.dto.EmployeeSearch;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
@@ -32,7 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Autowired
 	private EmployeeDAO employeeDAO;
-	
+
 	@Autowired
 	private EmailService emailService;
 
@@ -98,11 +99,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.setEmployeeDetails(employeeDetails);
 
 			EmployeeDTO emps = MAPPER.fromEmployeeModel(employeeDAO.save(employee));
-			
+
 			Map<String, Object> model = new HashMap<>();
-			model.put("fullName", emps.getFirstName()+" "+emps.getLastName());
+			model.put("fullName", emps.getFirstName() + " " + emps.getLastName());
 			emailService.sendEmailWelcome(model, emps.getEmailId());
-			
+
 			result = new Result(emps);
 			result.setStatusCode(HttpStatus.OK.value());
 			result.setSuccessMessage("Data added successfully and Send Emaail.");
@@ -225,7 +226,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Result mailChech(String mailchech) {
 		Result result = new Result();
 		try {
-			List<EmployeeDTO> employees = MAPPER.fromEmployeeModel(employeeDAO.mailChech(mailchech));
+			List<EmployeeDTO> employees = MAPPER.fromEmployeeModel(employeeDAO.findByEmailIdContainingIgnoreCase(mailchech));
 			if (employees != null && employees.size() == 0) {
 				result.setStatusCode(HttpStatus.BAD_REQUEST.value());
 				result.setErrorMessage("doesn't exist");
@@ -288,8 +289,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //	}
 
 	/**
-	 * Employee Data based on search field.
-	 * ( String - contains , Id - = )
+	 * Employee Data based on search field. ( String - contains , Id - = )
 	 * 
 	 * @param employeeSearch
 	 * 
@@ -382,5 +382,48 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return searchResult;
+	}
+
+	@Override
+	public Result findByListEmpId(EmployeeListSearch employeeListSearch) {
+		Result result = new Result();
+		try {
+			List<EmployeeDTO> employees = MAPPER
+					.fromEmployeeModel(employeeDAO.findByEmpIdIn(employeeListSearch.getEmpId()));
+			if (employees != null && employees.size() == 0) {
+				result.setStatusCode(HttpStatus.BAD_REQUEST.value());
+				result.setErrorMessage("doesn't exist");
+			} else {
+				result.setData(employees);
+				result.setStatusCode(HttpStatus.OK.value());
+				result.setSuccessMessage("Fetching success.");
+
+			}
+		} catch (Exception e) {
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return result;
+	}
+
+	@Override
+	public Result findByEmailIdAndFirstName(String emailId, String firstName) {
+		Result result = new Result();
+		try {
+			EmployeeDTO employeeDTO = MAPPER
+					.fromEmployeeModel(employeeDAO.findByEmailIdAndFirstName(emailId, firstName));
+			if (employeeDTO == null) {
+				result.setStatusCode(HttpStatus.NOT_FOUND.value());
+				result.setErrorMessage("doesn't exist");
+			} else {
+				result.setData(employeeDTO);
+				result.setStatusCode(HttpStatus.OK.value());
+				result.setSuccessMessage("Fetching success.");
+
+			}
+		} catch (Exception e) {
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return result;
 	}
 }
