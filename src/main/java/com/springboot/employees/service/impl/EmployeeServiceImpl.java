@@ -53,7 +53,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} catch (Exception e) {
 			throw new CustomException("Fetching Error.", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 		return result;
 	}
 
@@ -147,18 +146,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public Result deleteById(Long id) {
-		Result result = new Result();
+	public Result deleteById(String emailId) {
+		Long start = System.currentTimeMillis();
+		Result result = null;
 		try {
-
-			employeeDAO.deleteById(id);
-//			result = new Result(employee);
+//			employeeDAO.deleteById(id);
+			employeeDAO.deleteByEmailId(emailId);
+			result = new Result();
 			result.setStatusCode(HttpStatus.OK.value());
 			result.setSuccessMessage("delete successfully.");
 		} catch (Exception e) {
 			throw new CustomException("Id Not Found.", HttpStatus.NOT_FOUND);
 		}
-
+		Long end = System.currentTimeMillis();
+		log.info(">>>>>>>>>>>Time Calucated : {}", (end - start));
 		return result;
 	}
 
@@ -226,7 +227,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Result mailChech(String mailchech) {
 		Result result = new Result();
 		try {
-			List<EmployeeDTO> employees = MAPPER.fromEmployeeModel(employeeDAO.findByEmailIdContainingIgnoreCase(mailchech));
+			List<EmployeeDTO> employees = MAPPER
+					.fromEmployeeModel(employeeDAO.findByEmailIdContainingIgnoreCase(mailchech));
 			if (employees != null && employees.size() == 0) {
 				result.setStatusCode(HttpStatus.BAD_REQUEST.value());
 				result.setErrorMessage("doesn't exist");
@@ -289,7 +291,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //	}
 
 	/**
-	 * Employee Data based on search field. ( String - contains , Id - = )
+	 * Employee Data based on search field. ( String -> contains , Id -> = ,List<Id>
+	 * -> In)
 	 * 
 	 * @param employeeSearch
 	 * 
@@ -316,16 +319,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 				filters.put(Constants.LIKE, employeeSearch.getFirstName());
 				dynamicFilters.put(Constants.FIRST_NAME, filters);
 			}
-//			if (employeeSearch.getEmpDetailsId() != null && employeeSearch.getEmpDetailsId().size() > 0) {
-//				filters = new HashMap<String, Object>();
-//				filters.put(Constants.IN, 0);
-//				dynamicFilters.put(Constants.EMP_ID, filters);
-//			}
-			if (employeeSearch.getEmpId() != null) {
+			if (employeeSearch.getEmpId() != null && employeeSearch.getEmpId().size() > 0) {
 				filters = new HashMap<String, Object>();
-				filters.put(Constants.EQUALS, employeeSearch.getEmpId());
+				filters.put(Constants.IN, employeeSearch.getEmpId());
 				dynamicFilters.put(Constants.EMP_ID, filters);
 			}
+//			if (employeeSearch.getEmpId() != null) {
+//				filters = new HashMap<String, Object>();
+//				filters.put(Constants.EQUALS, employeeSearch.getEmpId());
+//				dynamicFilters.put(Constants.EMP_ID, filters);
+//			}
 			if (employeeSearch.getEmailId() != null) {
 				filters = new HashMap<String, Object>();
 				filters.put(Constants.LIKE, employeeSearch.getEmailId());

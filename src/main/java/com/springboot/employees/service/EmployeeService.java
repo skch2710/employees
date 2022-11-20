@@ -19,7 +19,8 @@ public interface EmployeeService {
 
 	public Result update(EmployeeDTO employeeDTO);
 
-	public Result deleteById(Long id);
+//	public Result deleteById(Long id);
+	public Result deleteById(String emailId);
 
 	/**
 	 * EmailExist.

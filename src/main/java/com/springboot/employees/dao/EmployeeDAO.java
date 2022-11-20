@@ -2,6 +2,8 @@ package com.springboot.employees.dao;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,4 +45,7 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	List<Employee> findByEmpIdIn(List<Long> empId);
 	
 	Employee findByEmailIdAndFirstName(String emailId,String firstName);
+	
+	@Transactional
+	void deleteByEmailId(String emailId);
 }

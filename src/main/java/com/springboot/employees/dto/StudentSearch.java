@@ -8,14 +8,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeSearch extends Pagination {
-
-	private List<Long> empId;
-//	private Long empId;
-	private String firstName;
-	private String emailId;
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class StudentSearch extends Pagination{
+	
+	private List<String> emailId;
 
 }

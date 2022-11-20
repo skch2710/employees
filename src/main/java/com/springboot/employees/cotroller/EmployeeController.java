@@ -55,9 +55,9 @@ public class EmployeeController {
 		return new ResponseEntity<Result>(employeeService.update(empData), HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteById/{empid}")
-	public ResponseEntity<Result> deleteById(@PathVariable Long empid) {
-		Result result = employeeService.deleteById(empid);
+	@DeleteMapping("/deleteById/{emailId}")
+	public ResponseEntity<Result> deleteById(@PathVariable String emailId) {
+		Result result = employeeService.deleteById(emailId);
 		return ResponseEntity.ok(result);
 	}
 

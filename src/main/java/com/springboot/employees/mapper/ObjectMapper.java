@@ -10,8 +10,10 @@ import org.mapstruct.factory.Mappers;
 
 import com.springboot.employees.dto.EmployeeDTO;
 import com.springboot.employees.dto.EmployeeDetailsDTO;
+import com.springboot.employees.dto.StudentDTO;
 import com.springboot.employees.model.Employee;
 import com.springboot.employees.model.EmployeeDetails;
+import com.springboot.employees.model.Student;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ObjectMapper {
@@ -34,4 +36,6 @@ public interface ObjectMapper {
 	
 //	@InheritInverseConfiguration
 //	Employee fromEmployeeDTO(EmployeeDTO employeeDTO);
+	
+	List<Student> fromStudentDTO(List<StudentDTO> studentDTOs);
 }
