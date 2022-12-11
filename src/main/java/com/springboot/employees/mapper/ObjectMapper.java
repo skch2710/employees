@@ -20,7 +20,7 @@ public interface ObjectMapper {
 
 	ObjectMapper INSTANCE = Mappers.getMapper(ObjectMapper.class);
 	
-	@Mapping(source = "employeeDetails.salary", target = "salary",numberFormat = "₹#.00")
+	@Mapping(source = "employeeDetails.salary", target = "salary",numberFormat = "₹#,##0.00")
 	@Mapping(source = "employeeDetails.address", target = "address")
 	EmployeeDTO fromEmployeeModel(Employee employee);
 	

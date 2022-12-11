@@ -1,5 +1,6 @@
 package com.springboot.employees.service.impl;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.setEmailId(employeeDTO.getEmailId());
 
 			EmployeeDetails employeeDetails = new EmployeeDetails();
-			employeeDetails.setSalary(Double.valueOf(employeeDTO.getSalary()));
+//			employeeDetails.setSalary(Double.valueOf(employeeDTO.getSalary()));
+			employeeDetails.setSalary(new BigDecimal(employeeDTO.getSalary()));
 			employeeDetails.setAddress(employeeDTO.getAddress());
 			employee.setEmployeeDetails(employeeDetails);
 
@@ -102,7 +104,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Map<String, Object> model = new HashMap<>();
 			model.put("fullName", emps.getFirstName() + " " + emps.getLastName());
 			emailService.sendEmailWelcome(model, emps.getEmailId());
-
+//			EmployeeDTO emps=null;
+//			for (int i = 1; i < 100001; i++) {
+//				Employee employee = new Employee();
+//
+//				employee.setFirstName(employeeDTO.getFirstName()+i);
+//				employee.setLastName(employeeDTO.getLastName()+i);
+//				employee.setEmailId(employeeDTO.getEmailId()+i+"@gmail.com");
+//
+//				EmployeeDetails employeeDetails = new EmployeeDetails();
+//				employeeDetails.setSalary(Double.valueOf(employeeDTO.getSalary()+i));
+//				employeeDetails.setAddress(employeeDTO.getAddress()+i);
+//				employee.setEmployeeDetails(employeeDetails);
+//
+//				emps = MAPPER.fromEmployeeModel(employeeDAO.save(employee));
+//			}
+			
 			result = new Result(emps);
 			result.setStatusCode(HttpStatus.OK.value());
 			result.setSuccessMessage("Data added successfully and Send Emaail.");
@@ -128,7 +145,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employee.setEmailId(employeeDTO.getEmailId());
 
 				EmployeeDetails employeeDetails = employee.getEmployeeDetails();
-				employeeDetails.setSalary(Double.valueOf(employeeDTO.getSalary()));
+				employeeDetails.setSalary(new BigDecimal(employeeDTO.getSalary()));
 				employeeDetails.setAddress(employeeDTO.getAddress());
 				employee.setEmployeeDetails(employeeDetails);
 
