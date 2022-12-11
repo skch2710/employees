@@ -60,7 +60,12 @@ public class EmployeeController {
 		Result result = employeeService.deleteById(emailId);
 		return ResponseEntity.ok(result);
 	}
-
+	
+	/**
+	 * 
+	 * @param emailid
+	 * @return
+	 */
 	@GetMapping("/findByEmailId/{emailid}")
 	public ResponseEntity<Result> findByEmailId(@PathVariable String emailid) {
 		Result result = employeeService.findByEmailId(emailid);

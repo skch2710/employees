@@ -319,7 +319,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 				filters.put(Constants.LIKE, employeeSearch.getFirstName());
 				dynamicFilters.put(Constants.FIRST_NAME, filters);
 			}
-			if (employeeSearch.getEmpId() != null && employeeSearch.getEmpId().size() > 0) {
+			if (employeeSearch.getEmpId() != null && employeeSearch.getEmpId().size() > 0
+					&& employeeSearch.getEmpId().get(0) != 0) {
 				filters = new HashMap<String, Object>();
 				filters.put(Constants.IN, employeeSearch.getEmpId());
 				dynamicFilters.put(Constants.EMP_ID, filters);
@@ -357,6 +358,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 
 		} catch (Exception e) {
+			log.error("error in Employee search::", e);
 			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
