@@ -2,7 +2,6 @@ package com.springboot.employees.mapper;
 
 import java.util.List;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -20,6 +19,15 @@ public interface ObjectMapper {
 
 	ObjectMapper INSTANCE = Mappers.getMapper(ObjectMapper.class);
 	
+	default String mapName(Employee employee) {
+		return employee.getFirstName() != null ? "$" + employee.getFirstName() : null;
+	}
+	
+//	default String mapName(String name) {
+//		return name != null ? "$" + name : null;
+//	}
+	
+	@Mapping(target = "firstName", expression = "java(mapName(employee))")
 	@Mapping(source = "employeeDetails.salary", target = "salary",numberFormat = "₹#,##0.00")
 	@Mapping(source = "employeeDetails.address", target = "address")
 	EmployeeDTO fromEmployeeModel(Employee employee);
