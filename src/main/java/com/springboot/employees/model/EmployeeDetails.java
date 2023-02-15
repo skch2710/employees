@@ -24,7 +24,9 @@ public class EmployeeDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long empDetailsId;
+	
 	private BigDecimal salary;
+	
 	private String address;
 	
 	@JsonIgnore
