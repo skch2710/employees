@@ -48,4 +48,9 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	
 	@Transactional
 	void deleteByEmailId(String emailId);
+	
+	/* findAllByOrderBy{PropertyName}{Asc/Desc} */
+	List<Employee> findAllByOrderByFirstName();
+	List<Employee> findAllByOrderByFirstNameAsc();
+	List<Employee> findAllByOrderByFirstNameDesc();
 }
