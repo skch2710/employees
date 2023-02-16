@@ -1,5 +1,9 @@
 package com.springboot.employees.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public final class Constants {
 	public static final String SATHISH_KUMAR = "ch sathish kumar";
 	public static final Long MONTHS = 12L;
@@ -18,4 +22,7 @@ public final class Constants {
 	public static final String EMP_ID = "empId";
 	public static final String EMAIL_ID = "emailId";
 	public static final String EQUALS = "=";
+	
+	public static final List<Long> EMP_IDs = Arrays.asList(4L,8L);
+	public static final ArrayList<Integer> NUMBERS = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
 }

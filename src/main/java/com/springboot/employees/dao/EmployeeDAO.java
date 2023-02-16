@@ -44,6 +44,8 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	
 	List<Employee> findByEmpIdIn(List<Long> empId);
 	
+	List<Employee> findByEmpIdNotIn(List<Long> empIds);
+	
 	Employee findByEmailIdAndFirstName(String emailId,String firstName);
 	
 	@Transactional
@@ -53,4 +55,5 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	List<Employee> findAllByOrderByFirstName();
 	List<Employee> findAllByOrderByFirstNameAsc();
 	List<Employee> findAllByOrderByFirstNameDesc();
+	
 }
