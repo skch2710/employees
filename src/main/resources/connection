@@ -1,6 +1,6 @@
 DB_PASSWORD=Sathish@123
 DB_USERNAME=postgres
-JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5435/postgres
+JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5432/postgres
 
 ====================*****************===================
 
@@ -11,7 +11,7 @@ JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5435/postgres
 
 #JDBC Connections For Postgres SQL
 
-spring.datasource.url=jdbc:postgresql://localhost:5435/postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
 #spring.datasource.url=jdbc:postgresql://sathish.cs1yjy5x67qh.ap-northeast-1.rds.amazonaws.com:5432/sathish
 spring.datasource.username=postgres
 spring.datasource.password=Sathish@123
@@ -32,3 +32,151 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 
 spring.jpa.open-in-view=false
+
+
+
+************************************************************
+################### YML ###############################
+
+
+server:
+  port: 8484
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    url: ${JDBC_CONNECTION_STRING}
+    hikari:
+      minimum-idle: 25
+      maximum-pool-size: 200
+      idle-timeout: 30000
+      pool-name: SpringBootJPAHikariCP
+      connection-timeout: 30000
+  jpa:
+    properties:
+      hibernate:
+        ddl-auto: create
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+#    hibernate:
+#      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+
+  mail:
+    host: smtp.office365.com
+    username: skch2710@hotmail.com
+    password: Chitti484@
+    protocol: smtp
+    port: 587
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
+springfox:
+  documentation:
+    auto-startup: false
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
+    
+    
+    
+******************** TABLE *******************
+
+-- Table: employees.employee
+
+-- DROP TABLE IF EXISTS employees.employee;
+
+CREATE TABLE IF NOT EXISTS employees.employee
+(
+    emp_id bigint NOT NULL DEFAULT 'nextval('employees.employee_emp_id_seq'::regclass)',
+    email_id character varying(255) COLLATE pg_catalog."default",
+    first_name character varying(255) COLLATE pg_catalog."default",
+    last_name character varying(255) COLLATE pg_catalog."default",
+    emp_details_id bigint,
+    CONSTRAINT employee_pkey PRIMARY KEY (emp_id),
+    CONSTRAINT fkmo942ol7w8ddhkjb1phty3tje FOREIGN KEY (emp_details_id)
+        REFERENCES employees.employee_details (emp_details_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS employees.employee
+    OWNER to postgres;
+    
+
+
+-- Table: employees.employee_details
+
+-- DROP TABLE IF EXISTS employees.employee_details;
+
+CREATE TABLE IF NOT EXISTS employees.employee_details
+(
+    emp_details_id bigint NOT NULL DEFAULT 'nextval('employees.employee_details_emp_details_id_seq'::regclass)',
+    address character varying(255) COLLATE pg_catalog."default",
+    salary numeric(19,2),
+    CONSTRAINT employee_details_pkey PRIMARY KEY (emp_details_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS employees.employee_details
+    OWNER to postgres;
+    
+    
+    
+    
+-- Table: employees.students
+
+-- DROP TABLE IF EXISTS employees.students;
+
+CREATE TABLE IF NOT EXISTS employees.students
+(
+    student_id bigint NOT NULL DEFAULT 'nextval('employees.students_student_id_seq'::regclass)',
+    email_id character varying(255) COLLATE pg_catalog."default",
+    first_name character varying(255) COLLATE pg_catalog."default",
+    last_name character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT students_pkey PRIMARY KEY (student_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS employees.students
+    OWNER to postgres;
+    
+    
+    
+    
+    
+-- View: employees.vw_emp
+
+-- DROP VIEW employees.vw_emp;
+
+CREATE OR REPLACE VIEW employees.vw_emp
+ AS
+ SELECT row_number() OVER (ORDER BY (now())) AS id,
+    e.emp_id,
+    e.email_id,
+    e.first_name,
+    e.last_name,
+    ed.emp_details_id,
+    ed.address,
+    ed.salary
+   FROM employees.employee e
+     LEFT JOIN employees.employee_details ed ON e.emp_details_id = ed.emp_details_id;
+
+ALTER TABLE employees.vw_emp
+    OWNER TO postgres;
+
