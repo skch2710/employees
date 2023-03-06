@@ -28,8 +28,8 @@ spring:
 
   mail:
     host: smtp.office365.com
-    username: skch2710@hotmail.com
-    password: Chitti484@
+    username: ${EMAIL_ID}
+    password: ${EMAIL_PASSWORD}
     protocol: smtp
     port: 587
     properties:
