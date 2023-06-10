@@ -101,7 +101,7 @@ logging:
 
 CREATE TABLE IF NOT EXISTS employees.employee
 (
-    emp_id bigint NOT NULL DEFAULT 'nextval('employees.employee_emp_id_seq'::regclass)',
+    emp_id bigint GENERATED ALWAYS AS IDENTITY,,
     email_id character varying(255) COLLATE pg_catalog."default",
     first_name character varying(255) COLLATE pg_catalog."default",
     last_name character varying(255) COLLATE pg_catalog."default",
@@ -126,7 +126,7 @@ ALTER TABLE IF EXISTS employees.employee
 
 CREATE TABLE IF NOT EXISTS employees.employee_details
 (
-    emp_details_id bigint NOT NULL DEFAULT 'nextval('employees.employee_details_emp_details_id_seq'::regclass)',
+    emp_details_id bigint GENERATED ALWAYS AS IDENTITY,,
     address character varying(255) COLLATE pg_catalog."default",
     salary numeric(19,2),
     CONSTRAINT employee_details_pkey PRIMARY KEY (emp_details_id)
@@ -146,7 +146,7 @@ ALTER TABLE IF EXISTS employees.employee_details
 
 CREATE TABLE IF NOT EXISTS employees.students
 (
-    student_id bigint NOT NULL DEFAULT 'nextval('employees.students_student_id_seq'::regclass)',
+    student_id bigint GENERATED ALWAYS AS IDENTITY,,
     email_id character varying(255) COLLATE pg_catalog."default",
     first_name character varying(255) COLLATE pg_catalog."default",
     last_name character varying(255) COLLATE pg_catalog."default",
