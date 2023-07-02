@@ -25,4 +25,6 @@ public final class Constants {
 	
 	public static final List<Long> EMP_IDs = Arrays.asList(4L,8L);
 	public static final ArrayList<Integer> NUMBERS = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
+	
+	public static final String IMAGE_LOGO  = "src/main/resources/images/image.png";
 }

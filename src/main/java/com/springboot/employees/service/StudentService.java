@@ -1,5 +1,6 @@
 package com.springboot.employees.service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import com.springboot.employees.dto.Result;
@@ -11,5 +12,9 @@ public interface StudentService {
 	Result getStudents(StudentSearch studentSearch);
 
 	Result saveStudent(List<StudentDTO> studentDTOs);
+	
+	ByteArrayOutputStream generatePdfWithTable();
+	
+	ByteArrayOutputStream downloadStudentExcel();
 
 }

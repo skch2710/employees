@@ -9,8 +9,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StudentDTO {
 
-	private String firstName;
-	private String lastName;
+	
+	private Long studentId;
+
+	private String fullName;
+
 	private String emailId;
+	
+	private String dob;
+
+	private String mobileNumber;
+
+	private String salary;
+	
+	private String fromDate;
+	
+	private String toDate;
 
 }

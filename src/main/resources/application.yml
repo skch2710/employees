@@ -1,5 +1,5 @@
 server:
-  port: 8484
+  port: 8080
   forward-headers-strategy: framework
 
 spring:
@@ -17,9 +17,11 @@ spring:
   jpa:
     properties:
       hibernate:
+        ddl-auto: update
         globally_quoted_identifiers: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        
 #    hibernate:
 #      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
 #      naming:

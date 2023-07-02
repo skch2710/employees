@@ -28,10 +28,17 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	//testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	
+	//For swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
+	//For Excel
 	implementation 'org.apache.poi:poi-ooxml:4.1.2'
+	
+	//For Mail sending
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+	
+	//For pdf
+	implementation 'com.itextpdf:itextpdf:5.5.13'
 	
 	//for object mapping
 	implementation 'org.mapstruct:mapstruct:1.5.2.Final'

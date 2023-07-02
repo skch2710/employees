@@ -45,5 +45,9 @@ public interface ObjectMapper {
 //	@InheritInverseConfiguration
 //	Employee fromEmployeeDTO(EmployeeDTO employeeDTO);
 	
+	@Mapping(source = "dob", target = "dob", dateFormat = "MM/dd/yyyy")
+	@Mapping(source = "fromDate", target = "fromDate", dateFormat = "MM/dd/yyyy")
+	@Mapping(source = "toDate", target = "toDate", dateFormat = "MM/dd/yyyy")
+	Student fromStudentDTO(StudentDTO studentDTO);
 	List<Student> fromStudentDTO(List<StudentDTO> studentDTOs);
 }

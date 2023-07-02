@@ -1,12 +1,16 @@
 package com.springboot.employees.email;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -69,7 +74,6 @@ public class EmailService {
 
 		MimeMessage message = mailSender.createMimeMessage();
 		try {
-			System.out.println(" in send mail :" + strSubject);
 			MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
 					StandardCharsets.UTF_8.name());
 
@@ -77,6 +81,36 @@ public class EmailService {
 			helper.setText(createTemplete(htmlFile, model), true);
 			helper.setSubject(strSubject);
 			helper.setFrom(fromEmail, personal_message);
+			mailSender.send(message);
+
+		} catch (MessagingException | UnsupportedEncodingException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	// With Attachments
+	public void sendEmail(Map<String, Object> model, String toMail, String htmlFile, String strSubject,
+			ByteArrayOutputStream excelStream, ByteArrayOutputStream pdfStream) {
+
+		MimeMessage message = mailSender.createMimeMessage();
+		try {
+			MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+					StandardCharsets.UTF_8.name());
+
+			helper.setTo(toMail);
+			helper.setText(createTemplete(htmlFile, model), true);
+			helper.setSubject(strSubject);
+			helper.setFrom(fromEmail, personal_message);
+
+			// Attach the Excel file
+			ByteArrayDataSource excelDataSource = new ByteArrayDataSource(excelStream.toByteArray(),
+					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			helper.addAttachment("excel_attachment.xlsx", excelDataSource);
+
+			// Attach the PDF file
+			ByteArrayDataSource pdfDataSource = new ByteArrayDataSource(pdfStream.toByteArray(), "application/pdf");
+			helper.addAttachment("pdf_attachment.pdf", pdfDataSource);
+
 			mailSender.send(message);
 
 		} catch (MessagingException | UnsupportedEncodingException e) {
@@ -93,5 +127,19 @@ public class EmailService {
 	@Async
 	public void sendEmailWelcome(Map<String, Object> model, String toMail) {
 		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish");
+	}
+	
+	/**
+	 * Send email with attachment.
+	 *
+	 * @param model  the model
+	 * @param ByteArrayOutputStream excelStream
+	 * @param ByteArrayOutputStream pdfStream
+	 * @param toMail the to mail
+	 */
+	@Async
+	public void sendEmailWelcome(Map<String, Object> model, String toMail,
+			ByteArrayOutputStream excelStream, ByteArrayOutputStream pdfStream) {
+		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish",excelStream,pdfStream);
 	}
 }
