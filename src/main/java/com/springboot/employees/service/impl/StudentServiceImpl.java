@@ -19,6 +19,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ import com.springboot.employees.dao.StudentDAO;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
 import com.springboot.employees.dto.StudentDTO;
+import com.springboot.employees.dto.StudentDropSearch;
 import com.springboot.employees.dto.StudentSearch;
 import com.springboot.employees.email.EmailService;
 import com.springboot.employees.exception.CustomException;
@@ -163,6 +165,8 @@ public class StudentServiceImpl implements StudentService {
 					result.setSuccessMessage("Getting Student Details.");
 				}
 			} else {
+				result.setStatusCode(HttpStatus.OK.value());
+				result.setSuccessMessage("Getting Student Details.");
 				result.setData(exportData(search, dynamicFilters,addDynamicFilters));
 			}
 
@@ -479,6 +483,47 @@ public class StudentServiceImpl implements StudentService {
 			log.error("error in create Student Table ", e);
 			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@Override
+	public Result searchDropStudent(StudentDropSearch search) {
+		
+		Result result = null;
+		try {
+			Map<String, Object> filters = null;
+			Map<String, Map<String, Object>> dynamicFilters = new HashMap<>();
+			Sort sort = Sort.by(Sort.Order.asc(Constants.FULL_NAME));
+			
+			if(search.getStudentId() != null && search.getStudentId().size() > 0 && search.getStudentId().get(0) > 0 ) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.IN, search.getStudentId());
+				dynamicFilters.put(Constants.STUDENT_ID, filters);
+			}
+			if(search.getFullName() != null && !search.getFullName().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.START_WITH, search.getFullName());
+				dynamicFilters.put(Constants.FULL_NAME, filters);
+			}
+			
+			Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
+			List<Student> students = studentDAO.findAll(specification, sort);
+			
+			result = new Result();
+			
+			if(students.size()==0) {
+				result.setStatusCode(HttpStatus.NOT_FOUND.value());
+				result.setErrorMessage("NO RESULT FOUND.");
+			}else {
+				result.setData(students);
+				result.setStatusCode(HttpStatus.OK.value());
+				result.setSuccessMessage("Getting Student Details.");
+			}
+			
+		}catch (Exception e) {
+			log.error("error in searchDropStudent ", e);
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return result;
 	}
 
 }

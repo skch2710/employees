@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.itextpdf.text.DocumentException;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.StudentDTO;
+import com.springboot.employees.dto.StudentDropSearch;
 import com.springboot.employees.dto.StudentSearch;
 import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.service.StudentService;
@@ -44,6 +45,11 @@ public class StudentController {
 	@PostMapping("/students")
 	public ResponseEntity<?> getStudents(@RequestBody StudentSearch studentSearch) {
 		return ResponseEntity.ok(studentService.getStudents(studentSearch));
+	}
+	
+	@PostMapping("/drop-search")
+	public ResponseEntity<?> searchDropStudent(@RequestBody StudentDropSearch search) {
+		return ResponseEntity.ok(studentService.searchDropStudent(search));
 	}
 
 	/**
