@@ -1,7 +1,7 @@
 package com.springboot.employees.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,13 +24,13 @@ public class Student {
 
 	private String emailId;
 	
-	private LocalDate dob;
+	private Date dob;
 
 	private String mobileNumber;
 
 	private BigDecimal salary;
 	
-	private LocalDate fromDate;
+	private Date fromDate;
 	
-	private LocalDate toDate;
+	private Date toDate;
 }

@@ -9,12 +9,12 @@ import com.springboot.employees.dto.StudentSearch;
 
 public interface StudentService {
 
-	Result getStudents(StudentSearch studentSearch);
+	Result getStudents(StudentSearch search);
 
 	Result saveStudent(List<StudentDTO> studentDTOs);
 	
-	ByteArrayOutputStream generatePdfWithTable();
+	ByteArrayOutputStream generatePdfWithTable(StudentSearch search);
 	
-	ByteArrayOutputStream downloadStudentExcel();
-
+	ByteArrayOutputStream downloadStudentExcel(StudentSearch search);
+	
 }

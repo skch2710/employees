@@ -21,4 +21,8 @@ public interface StudentDAO extends JpaRepository<Student, Long> {
 
 	@Query("SELECT s FROM Student s WHERE emailId in ?1")
 	List<Student> getStudents(List<String> emailId,Specification<Employee> spec, Sort sort);
+	
+	Page<Student> findAll(Specification<Student> spec, Pageable pageable);
+
+	List<Student> findAll(Specification<Student> spec, Sort sort);
 }

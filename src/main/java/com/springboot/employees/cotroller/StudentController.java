@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,10 +57,10 @@ public class StudentController {
 		return ResponseEntity.ok(studentService.saveStudent(studentDTOs));
 	}
 	
-	@GetMapping("/download-student-excel")
-	public ResponseEntity<?> downloadStudentExcel() {
+	@PostMapping("/download-student-excel")
+	public ResponseEntity<?> downloadStudentExcel(@RequestBody StudentSearch search) {
 		try {
-			ByteArrayOutputStream outputStream = studentService.downloadStudentExcel();
+			ByteArrayOutputStream outputStream = studentService.downloadStudentExcel(search);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -79,8 +78,8 @@ public class StudentController {
 		}
 	}
 
-	@GetMapping("/zip-download")
-	public ResponseEntity<?> downloadZip() throws DocumentException {
+	@PostMapping("/zip-download")
+	public ResponseEntity<?> downloadZip(@RequestBody StudentSearch search) throws DocumentException {
 		try {
 			String zipFileName = "files.zip";
 			HttpHeaders headers = new HttpHeaders();
@@ -89,8 +88,8 @@ public class StudentController {
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(baos))) {
-				Utility.createFileToZip(zipOutputStream, "example.xlsx", studentService.downloadStudentExcel());
-				Utility.createFileToZip(zipOutputStream, "example1.pdf", studentService.generatePdfWithTable());
+				Utility.createFileToZip(zipOutputStream, "example.xlsx", studentService.downloadStudentExcel(search));
+				Utility.createFileToZip(zipOutputStream, "example1.pdf", studentService.generatePdfWithTable(search));
 				// Add more files to the zip if needed
 				zipOutputStream.finish();
 			}
@@ -103,10 +102,10 @@ public class StudentController {
 		}
 	}
 
-	@GetMapping("/generate-pdf")
-	public ResponseEntity<?> generatePdf() throws DocumentException {
+	@PostMapping("/generate-pdf")
+	public ResponseEntity<?> generatePdf(@RequestBody StudentSearch search) throws DocumentException {
 		try {
-			ByteArrayOutputStream outputStream = studentService.generatePdfWithTable();
+			ByteArrayOutputStream outputStream = studentService.generatePdfWithTable(search);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);

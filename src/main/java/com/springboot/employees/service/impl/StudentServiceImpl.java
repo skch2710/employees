@@ -19,6 +19,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -68,39 +69,101 @@ public class StudentServiceImpl implements StudentService {
 	 * 
 	 */
 	@Override
-	public Result getStudents(StudentSearch studentSearch) {
+	public Result getStudents(StudentSearch search) {
 		Long start = System.currentTimeMillis();
 		Result result = null;
 		try {
 			Map<String, Object> filters = null;
 			Map<String, Map<String, Object>> dynamicFilters = new HashMap<>();
+			Map<String, Map<String, Object>> addDynamicFilters = new HashMap<String, Map<String, Object>>();
 
-			if (studentSearch.getSortBy() == null || "".equalsIgnoreCase(studentSearch.getSortBy())) {
-				studentSearch.setSortBy(Constants.FIRST_NAME);
+			if (search.getSortBy() == null || search.getSortBy().isEmpty()) {
+				search.setSortBy(Constants.FULL_NAME);
+			}
+			if (search.getSortOrder() == null || "".equalsIgnoreCase(search.getSortOrder())) {
+				search.setSortOrder("asc");
 			}
 
-			if (studentSearch.getColumnFilters() != null) {
-				GenericSpecification.dynamicFilters(studentSearch.getColumnFilters(), dynamicFilters);
+			if (search.getColumnFilters() != null) {
+				GenericSpecification.dynamicFilters(search.getColumnFilters(), dynamicFilters);
 			}
-//			Pageable paging = PageRequest.of(studentSearch.getPageNumber(), studentSearch.getPageSize());
+			
+			if(search.getStudentId() != null && search.getStudentId().size() > 0 && search.getStudentId().get(0) > 0 ) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.IN, search.getStudentId());
+				dynamicFilters.put(Constants.STUDENT_ID, filters);
+			}
+			if(search.getEmailId() != null && search.getEmailId().size() > 0) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.STRING_IN, search.getEmailId());
+				dynamicFilters.put(Constants.EMAIL_ID, filters);
+			}
+			if(search.getFullName() != null && !search.getFullName().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.LIKE, search.getFullName());
+				dynamicFilters.put(Constants.FULL_NAME, filters);
+			}
+			if(search.getDob() != null && !search.getDob().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.EQUALS, search.getDob());
+				dynamicFilters.put(Constants.DOB, filters);
+			}
+			if(search.getFromDob() != null && !search.getFromDob().isEmpty() &&
+					search.getToDob() != null && !search.getToDob().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				Map<String, String> dateMap = new HashMap<>();
+				dateMap.put(Constants.START_DATE, search.getFromDob().concat(" 00:00:00.000"));
+				dateMap.put(Constants.END_DATE, search.getToDob().concat(" 23:59:00.000"));
+				filters.put(Constants.BETWEEN_TIME_STAMP, dateMap);
+				dynamicFilters.put(Constants.DOB, filters);
+			}
+			if (search.getFromDate() != null && !search.getFromDate().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.BETWEEN_DATE, search.getFromDate());
+				dynamicFilters.put(Constants.FROM_DATE, filters);
+			}
+			if (search.getToDate() != null && !"".equals(search.getToDate())) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.BETWEEN_DATE, search.getToDate());
+				dynamicFilters.put(Constants.TO_DATE, filters);
+			}
+			if (search.getSalary() != null && !search.getSalary().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.START_WITH, search.getSalary());
+				dynamicFilters.put(Constants.SALARY, filters);
+			}
+			if (search.getFromSalary() != null && !search.getFromSalary().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.GREATER_THAN_EQUAL, search.getFromSalary());
+				dynamicFilters.put(Constants.SALARY, filters);
+			}
+			if (search.getToSalary() != null && !"".equals(search.getToSalary())) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.LESS_THAN_EQUAL, search.getToSalary());
+				addDynamicFilters.put(Constants.SALARY, filters);
+			}
 
 			result = new Result();
 
-			if (!studentSearch.isExport()) {
-
-				Page<Student> pageResult = studentDAO.getStudents(studentSearch.getEmailId(),
-						GenericSpecification.getSpecification(dynamicFilters),
-						GenericSpecification.getPagination(studentSearch));
-
-				SearchResult<Student> searchResult = GenericSpecification.getPaginationDetails(pageResult,
-						Student.class);
-				searchResult.setContent(pageResult.getContent());
-
+			if (!search.isExport()) {
+				Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
+				if (!addDynamicFilters.isEmpty()) {
+					specification = GenericSpecification.additionalSpecification(specification, addDynamicFilters);
+				}
+				Page<Student> pageResult = studentDAO.findAll(specification,GenericSpecification.getPagination(search));
+				SearchResult<StudentDTO> searchResult = GenericSpecification.getPaginationDetails(pageResult,StudentDTO.class);
+				List<StudentDTO> studentDTOs = MAPPER.fromStudentModel(pageResult.getContent());
+				searchResult.setContent(studentDTOs);
 				result.setData(searchResult);
-				result.setStatusCode(HttpStatus.OK.value());
-				result.setSuccessMessage("Getting Student Details.");
+				if(studentDTOs.size()==0) {
+					result.setStatusCode(HttpStatus.NOT_FOUND.value());
+					result.setErrorMessage("NO RESULT FOUND.");
+				}else {
+					result.setStatusCode(HttpStatus.OK.value());
+					result.setSuccessMessage("Getting Student Details.");
+				}
 			} else {
-				result.setData(exportData(studentSearch, dynamicFilters));
+				result.setData(exportData(search, dynamicFilters,addDynamicFilters));
 			}
 
 		} catch (Exception e) {
@@ -119,12 +182,15 @@ public class StudentServiceImpl implements StudentService {
 	 * @param dynamicFilters the dynamic filters
 	 * @return the search result
 	 */
-	private SearchResult<Student> exportData(StudentSearch studentSearch,
-			Map<String, Map<String, Object>> dynamicFilters) {
+	private SearchResult<Student> exportData(StudentSearch search,
+			Map<String, Map<String, Object>> dynamicFilters,Map<String, Map<String, Object>> addDynamicFilters) {
 		SearchResult<Student> searchResult = new SearchResult<>();
 		try {
-			List<Student> sortResult = studentDAO.getStudents(studentSearch.getEmailId(),
-					GenericSpecification.getSpecification(dynamicFilters), GenericSpecification.getSort(studentSearch));
+			Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
+			if (!addDynamicFilters.isEmpty()) {
+				specification = GenericSpecification.additionalSpecification(specification, addDynamicFilters);
+			}
+			List<Student> sortResult = studentDAO.findAll(specification, GenericSpecification.getSort(search));
 			searchResult.setContent(sortResult);
 		} catch (Exception e) {
 			log.error("Error in exportData :: ", e);
@@ -147,17 +213,17 @@ public class StudentServiceImpl implements StudentService {
 		try {
 			List<Student> students = batchInsertRecords(studentDTOs);
 			
-			if(!students.isEmpty()) {
-				
-				ByteArrayOutputStream excelStream = downloadStudentExcel();
-				ByteArrayOutputStream pdfStream = generatePdfWithTable();
-				
-				students.forEach(student->{
-					Map<String, Object> model = new HashMap<>();
-					model.put("fullName", student.getFullName());
-					emailService.sendEmailWelcome(model, student.getEmailId(),excelStream,pdfStream);
-				});
-			}
+//			if(!students.isEmpty()) {
+//				
+//				ByteArrayOutputStream excelStream = downloadStudentExcel();
+//				ByteArrayOutputStream pdfStream = generatePdfWithTable();
+//				
+//				students.forEach(student->{
+//					Map<String, Object> model = new HashMap<>();
+//					model.put("fullName", student.getFullName());
+//					emailService.sendEmailWelcome(model, student.getEmailId(),excelStream,pdfStream);
+//				});
+//			}
 
 			result = new Result(students);
 			result.setStatusCode(HttpStatus.OK.value());
@@ -187,7 +253,7 @@ public class StudentServiceImpl implements StudentService {
 	 */
 
 	@Override
-	public ByteArrayOutputStream downloadStudentExcel() {
+	public ByteArrayOutputStream downloadStudentExcel(StudentSearch search) {
 		SXSSFWorkbook workbook;
 		ByteArrayOutputStream baos;
 		try {
@@ -195,8 +261,12 @@ public class StudentServiceImpl implements StudentService {
 			SXSSFSheet sheet = workbook.createSheet("Data");
 
 			// Simulate retrieving all records
-			List<Student> records = studentDAO.findAll();
+//			List<Student> records = studentDAO.findAll();
 //			List<StudentDTO> downloadStudents = MAPPER.fromStudent(records);
+			
+			@SuppressWarnings("unchecked")
+			SearchResult<Student> searchResult = (SearchResult<Student>) getStudents(search).getData();
+			List<Student> downloadStudents = searchResult.getContent();
 
 			// Define cell styles for header
 			CellStyle headerCellStyle = workbook.createCellStyle();
@@ -210,7 +280,7 @@ public class StudentServiceImpl implements StudentService {
 
 			CellStyle currencyCellStyle = workbook.createCellStyle();
 			DataFormat currencyDataFormat = workbook.createDataFormat();
-			currencyCellStyle.setDataFormat(currencyDataFormat.getFormat("$ #,##0.00"));
+			currencyCellStyle.setDataFormat(currencyDataFormat.getFormat("₹ #,##0.00"));
 
 			// Write the records to the Excel sheet
 			String[] HEADERs = { "Full Name", "Email ID", "DOB", "Mobile Number", "Salary", "From Date", "To Date" };
@@ -227,7 +297,7 @@ public class StudentServiceImpl implements StudentService {
 			sheet.createFreezePane(0, 1); // Freezing Headers
 
 			int rowid = 1;
-			for (Student studentDTO : records) {
+			for (Student studentDTO : downloadStudents) {
 				row = sheet.createRow(rowid++);
 				row.createCell(0).setCellValue(Utility.nullChech(studentDTO.getFullName()));
 				row.createCell(1).setCellValue(Utility.nullChech(studentDTO.getEmailId()));
@@ -259,7 +329,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 	
 	@Override
-	public ByteArrayOutputStream generatePdfWithTable() {
+	public ByteArrayOutputStream generatePdfWithTable(StudentSearch search) {
 		ByteArrayOutputStream baos;
 		try {
 //			Rectangle pagesize = new Rectangle(1754, 1240);
@@ -310,7 +380,9 @@ public class StudentServiceImpl implements StudentService {
 			createLineSeparator(document);
 
 			// Student Table Data
-			List<Student> students = studentDAO.findAll();
+			@SuppressWarnings("unchecked")
+			SearchResult<Student> searchResult = (SearchResult<Student>) getStudents(search).getData();
+			List<Student> students = searchResult.getContent();
 			createStudentTable(students, document);
 
 			PdfPTable belowTable = PdfHelper.createNoBorderTable(1, 5, 5, 80);
@@ -386,7 +458,7 @@ public class StudentServiceImpl implements StudentService {
 							Element.ALIGN_CENTER);
 					PdfHelper.createPdfPCell(studentTable, student.getMobileNumber(),
 							PdfHelper.getPoppinsFont(11, null), 5, Element.ALIGN_CENTER);
-					PdfHelper.createPdfPCell(studentTable, PdfHelper.dateConvert(student.getDob()),
+					PdfHelper.createPdfPCell(studentTable, Utility.dateConvert(student.getDob()),
 							PdfHelper.getPoppinsFont(11, null), 5, Element.ALIGN_CENTER);
 					PdfHelper.createPdfPCell(studentTable, PdfHelper.numberFormatGrid(student.getSalary()),
 							PdfHelper.getPoppinsFont(11, null), 5, Element.ALIGN_RIGHT);

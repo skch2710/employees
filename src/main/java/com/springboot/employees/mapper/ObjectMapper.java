@@ -50,4 +50,11 @@ public interface ObjectMapper {
 	@Mapping(source = "toDate", target = "toDate", dateFormat = "MM/dd/yyyy")
 	Student fromStudentDTO(StudentDTO studentDTO);
 	List<Student> fromStudentDTO(List<StudentDTO> studentDTOs);
+
+	@Mapping(source = "dob", target = "dob", dateFormat = "MM/dd/yyyy")
+	@Mapping(source = "fromDate", target = "fromDate", dateFormat = "MM/dd/yyyy")
+	@Mapping(source = "toDate", target = "toDate", dateFormat = "MM/dd/yyyy")
+	@Mapping(source = "salary", target = "salary",numberFormat = "₹ #,##0.00")
+	StudentDTO fromStudentModel(Student student);
+	List<StudentDTO> fromStudentModel(List<Student> students);
 }

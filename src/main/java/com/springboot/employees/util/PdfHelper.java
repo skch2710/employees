@@ -184,4 +184,29 @@ public class PdfHelper {
 		table.addCell(cell);
 	}
 	
+	public static void cellBottomBorder(PdfPTable table, String content, Font font, int paddingTop,int paddingBottom, int horizontalAlignment) {
+		 PdfPCell cell = new PdfPCell(new Phrase(content != null ? content : "", font));
+		    cell.setPaddingTop(paddingTop);
+		    cell.setPaddingBottom(paddingBottom);
+		    cell.setBorder(Rectangle.BOTTOM); // Set only the bottom border
+		    cell.setBorderColorBottom(BaseColor.BLACK); // Set the color of the bottom border
+		    cell.setBorderWidthBottom(2f); // Set the width of the bottom border
+		    cell.setHorizontalAlignment(horizontalAlignment);
+		    table.addCell(cell);
+	}
+	
+	public static void cellBottomTopBorder(PdfPTable table, String content, Font font, int paddingTop,int paddingBottom, int horizontalAlignment) {
+		 PdfPCell cell = new PdfPCell(new Phrase(content != null ? content : "", font));
+		    cell.setPaddingTop(paddingTop);
+		    cell.setPaddingBottom(paddingBottom);
+		    cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP); 
+		    cell.setBorderColorBottom(BaseColor.BLACK); 
+		    cell.setBorderColorTop(BaseColor.BLACK); 
+		    cell.setBorderWidthTop(2f); 
+		    cell.setBorderWidthBottom(2f); 
+		    cell.setHorizontalAlignment(horizontalAlignment);
+		    cell.setBackgroundColor(new BaseColor(242, 242, 242));
+		    table.addCell(cell);
+	}
+	
 }

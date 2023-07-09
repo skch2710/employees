@@ -11,8 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StudentSearch extends Pagination{
-	
-	private List<String> emailId;
+public class StudentSearch extends Pagination {
 
+	private List<String> emailId;
+	private List<Long> studentId;
+	private String fullName;
+	private String dob;
+	private String fromDob;
+	private String toDob;
+	private String fromDate;
+	private String toDate;
+	private String salary;
+	private String fromSalary;
+	private String toSalary;
+	
 }
