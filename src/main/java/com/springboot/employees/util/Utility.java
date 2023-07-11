@@ -3,6 +3,7 @@ package com.springboot.employees.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +14,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.stereotype.Component;
+
+import com.springboot.employees.common.Constants;
 
 @Component
 public class Utility {
@@ -102,5 +105,13 @@ public class Utility {
 		zipOutputStream.putNextEntry(zipEntry);
 		zipOutputStream.write(baos.toByteArray());
 		zipOutputStream.closeEntry();
+	}
+	
+	public static Date convertDate(String date) throws ParseException {
+		if(date!=null && !date.isEmpty()) {
+			return new SimpleDateFormat( Constants.DATE_FORMAT ).parse( date );
+		}else {
+			return null;
+		}
 	}
 }
