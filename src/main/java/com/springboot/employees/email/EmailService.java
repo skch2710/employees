@@ -117,6 +117,31 @@ public class EmailService {
 			log.error(e.getMessage());
 		}
 	}
+	
+	public void sendEmail(Map<String, Object> model, String toMail, String htmlFile, String strSubject,
+		ByteArrayOutputStream imageStream) {
+
+		MimeMessage message = mailSender.createMimeMessage();
+		try {
+			MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+					StandardCharsets.UTF_8.name());
+
+			helper.setTo(toMail);
+			helper.setText(createTemplete(htmlFile, model), true);
+			helper.setSubject(strSubject);
+			helper.setFrom(fromEmail, personal_message);
+
+			// Attach the image file
+			ByteArrayDataSource imageDataSource = new ByteArrayDataSource(imageStream.toByteArray(), "image/jpeg"); 
+			// Modify the MIME type accordingly (e.g., "image/jpeg" for JPEG files , for PNG "image/png" )
+			helper.addAttachment("image_attachment.jpeg", imageDataSource);
+
+			mailSender.send(message);
+
+		} catch (MessagingException | UnsupportedEncodingException e) {
+			log.error(e.getMessage());
+		}
+	}
 
 	/**
 	 * Send email welcome.
@@ -141,5 +166,11 @@ public class EmailService {
 	public void sendEmailWelcome(Map<String, Object> model, String toMail,
 			ByteArrayOutputStream excelStream, ByteArrayOutputStream pdfStream) {
 		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish",excelStream,pdfStream);
+	}
+	
+	@Async
+	public void sendEmailWelcome(Map<String, Object> model, String toMail,
+			ByteArrayOutputStream imageStream) {
+		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish",imageStream);
 	}
 }

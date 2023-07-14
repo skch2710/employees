@@ -3,6 +3,9 @@ package com.springboot.employees.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -14,6 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.springboot.employees.common.Constants;
 
@@ -51,7 +55,7 @@ public class Utility {
 	public static String nullChech(String input) {
 		return input != null ? input : "";
 	}
-	
+
 	public static String dateConvert(LocalDate date) {
 		if (date != null) {
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -79,7 +83,7 @@ public class Utility {
 			return null;
 		}
 	}
-	
+
 	public static BigDecimal numberConvert(String number) {
 		if (number != null && !number.isEmpty()) {
 			// Remove currency symbol and grouping separators
@@ -89,15 +93,15 @@ public class Utility {
 			return null;
 		}
 	}
-	
+
 	public static Double numberConvert(BigDecimal value) {
-	    if(value!=null) {
-	    	return value.doubleValue(); // Convert BigDecimal to double
-	    }else {
-	    	return 0d;
-	    }
+		if (value != null) {
+			return value.doubleValue(); // Convert BigDecimal to double
+		} else {
+			return 0d;
+		}
 	}
-	
+
 	public static void createFileToZip(ZipOutputStream zipOutputStream, String fileName, ByteArrayOutputStream baos)
 			throws IOException {
 		// Add the byte array to the zip as an entry
@@ -106,12 +110,32 @@ public class Utility {
 		zipOutputStream.write(baos.toByteArray());
 		zipOutputStream.closeEntry();
 	}
-	
+
 	public static Date convertDate(String date) throws ParseException {
-		if(date!=null && !date.isEmpty()) {
-			return new SimpleDateFormat( Constants.DATE_FORMAT ).parse( date );
-		}else {
+		if (date != null && !date.isEmpty()) {
+			return new SimpleDateFormat(Constants.DATE_FORMAT).parse(date);
+		} else {
 			return null;
 		}
+	}
+
+	public static ByteArrayOutputStream readImageToByteArrayOutputStream(String imagePath) throws IOException {
+		Path filePath = Paths.get(imagePath);
+		byte[] imageBytes = Files.readAllBytes(filePath);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		outputStream.write(imageBytes);
+
+		return outputStream;
+	}
+
+	public ByteArrayOutputStream convertMultipartFileToByteArrayOutputStream(MultipartFile imageFile)
+			throws IOException {
+		byte[] imageBytes = imageFile.getBytes();
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		outputStream.write(imageBytes);
+
+		return outputStream;
 	}
 }
