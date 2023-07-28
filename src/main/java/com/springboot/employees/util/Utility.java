@@ -138,4 +138,14 @@ public class Utility {
 
 		return outputStream;
 	}
+	
+//	public static Boolean checkRolesAccess(String role) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		Boolean isAccess = authentication.getAuthorities().stream().anyMatch(ga -> ga.getAuthority().equals(role));
+//		if (isAccess) {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//	}
 }
