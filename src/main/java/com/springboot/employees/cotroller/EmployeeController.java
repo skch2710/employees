@@ -20,8 +20,11 @@ import com.springboot.employees.dto.Pagination;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.service.EmployeeService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/api/v1/employee")
+@SecurityRequirement(name = "bearerAuth")
 public class EmployeeController {
 
 	@Autowired
