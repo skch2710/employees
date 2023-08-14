@@ -3,21 +3,21 @@ server:
   forward-headers-strategy: framework
   
 app:
- public-key: |
-    -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7+lMmYV8o1ClJx7Ja7cy
-    Bxk6AIwhBfdPMmpKcNox4yeRvVK//293+fQU+db5kjXoYOgfOI3RVEgy/CHA5JYa
-    +yAAHD+JuhABLKA/XuEnfKeePwXqP62tDjkWMH/TRB/6hPm2wXq9jKcfNuxgKTTj
-    ZsLD/FegB3RJwA1yUcTnW4B9zNam3nIfKESD1C+4H4x15L/9IGU08fcH1+XlK/S1
-    3gS3cbK9HTvAPt0GyUhqrX/Jxran+Nyc5g74R+u9Vy4Gb9VQIJtWxxL+lAD5nieG
-    7ehfuL+YYYM4OOfNrvT075/YYoCVsmEgc2A/yrIo9eZ0r/SWFCAGyWHOdDin8xJj
-    YQIDAQAB
-    -----END PUBLIC KEY-----
+  public-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6Q2lW4kepLJdZ4kauXed
+      GNyjU9zS7K3BkvjVtDvuVUF46RiCoRSyCYIF7+0jKZVCxPCSslRnId9vavbsG2xp
+      WEIURWkNiCAP0lKPm+hemQfjLIM1ZsUi8BU5Mzojp4vJW7MCC/OR9UKg1en5B1R8
+      Wg0tP3/7ub5X0YtMZtUf1DrnGaGnbHMS1Ka5+AB+qfh9l9IpTr5qzHQJooUYPp2k
+      qfO5B0Q17cAX05mktjQrK/JTKo7GkyK8NDc+oByL5aopzf4nZj+mk+L7O6LVHpKN
+      d7OyFzQJG01nwNL1y6qWsndtgI02aRV1eRIQQBmg1n+ebvi/d25UniX37FT6rcR+
+      BwIDAQAB
+      -----END PUBLIC KEY-----
   
 security:
   oauth2:
     client:
-      clientId: 340bdirectplus
+      clientId: sathish_ch
       clientSecret: password
       accessTokenUri: ${AUTH-SERVICE-ENDPOINT}/oauth/token
       user-authorization-uri: ${AUTH-SERVICE-ENDPOINT}/oauth/authorize
