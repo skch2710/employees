@@ -1,4 +1,4 @@
-DB_PASSWORD=Sathish@123
+DB_PASSWORD=Sathish123
 DB_USERNAME=postgres
 JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5432/postgres
 EMAIL_ID=temp2710@outlook.com
