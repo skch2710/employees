@@ -28,8 +28,11 @@ import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.service.StudentService;
 import com.springboot.employees.util.Utility;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/api/v1/student")
+@SecurityRequirement(name = "bearerAuth")
 public class StudentController {
 
 	@Autowired

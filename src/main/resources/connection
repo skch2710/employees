@@ -1,8 +1,9 @@
 DB_PASSWORD=Sathish123
 DB_USERNAME=postgres
-JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5432/postgres
 EMAIL_ID=temp2710@outlook.com
 EMAIL_PASSWORD=Temp@2710
+JDBC_CONNECTION_STRING=jdbc:postgresql://localhost:5432/postgres
+SECURITY-SERVICE-ENDPOINT=http://localhost:8060
 
 ====================*****************===================
 
@@ -131,13 +132,6 @@ CREATE TABLE IF NOT EXISTS employees.employee_details
     salary numeric(19,2),
     CONSTRAINT employee_details_pkey PRIMARY KEY (emp_details_id)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS employees.employee_details
-    OWNER to postgres;
-    
-    
     
     
 -- Table: employees.students
@@ -146,17 +140,16 @@ ALTER TABLE IF EXISTS employees.employee_details
 
 CREATE TABLE IF NOT EXISTS employees.students
 (
-    student_id bigint GENERATED ALWAYS AS IDENTITY,,
-    email_id character varying(255) COLLATE pg_catalog."default",
-    first_name character varying(255) COLLATE pg_catalog."default",
-    last_name character varying(255) COLLATE pg_catalog."default",
+    student_id bigint GENERATED ALWAYS AS IDENTITY,
+    email_id character varying(255),
+    full_name character varying(255),
+    mobile_number character varying(255),
+	dob TIMESTAMP ,
+	salary numeric(16,2),
+	from_date TIMESTAMP,
+	to_date TIMESTAMP,
     CONSTRAINT students_pkey PRIMARY KEY (student_id)
 )
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS employees.students
-    OWNER to postgres;
     
     
     

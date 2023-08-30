@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8062
   forward-headers-strategy: framework
   
 app:
@@ -19,14 +19,14 @@ security:
     client:
       clientId: sathish_ch
       clientSecret: password
-      accessTokenUri: ${AUTH-SERVICE-ENDPOINT}/oauth/token
-      user-authorization-uri: ${AUTH-SERVICE-ENDPOINT}/oauth/authorize
+      accessTokenUri: ${SECURITY-SERVICE-ENDPOINT}/oauth/token
+      user-authorization-uri: ${SECURITY-SERVICE-ENDPOINT}/oauth/authorize
     resource:
-      token-info-uri: ${AUTH-SERVICE-ENDPOINT}/oauth/check_token
-      user-info-uri:  ${AUTH-SERVICE-ENDPOINT}/userinfo
+      token-info-uri: ${SECURITY-SERVICE-ENDPOINT}/oauth/check_token
+      user-info-uri:  ${SECURITY-SERVICE-ENDPOINT}/userinfo
     resourceserver:
       jwt:
-        issuer-uri: ${AUTH-SERVICE-ENDPOINT}/oauth/token
+        issuer-uri: ${SECURITY-SERVICE-ENDPOINT}/oauth/token
 
 spring:
   datasource:
