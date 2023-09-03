@@ -10,9 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
 
 @Configuration
 @EnableResourceServer
@@ -21,8 +21,6 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 
 	private static final String ROOT_PATTERN = "/api/v1/**";
 
-	private TokenStore tokenStore;
-	
 	@Value("${app.public-key}")
 	private String publicKey;
 	
@@ -45,17 +43,15 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 	}
 
 	@Bean
-	public JwtAccessTokenConverter tokenEnhancer() {
+	JwtAccessTokenConverter tokenEnhancer() {
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-		// converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
 		return converter;
 	}
 
-	@Bean
-	public JwtTokenStore tokenStore() {
-		return new JwtTokenStore(tokenEnhancer());
-	}
-
+    @Bean
+    JwtTokenStore tokenStore() {
+        return new JwtTokenStore(tokenEnhancer());
+    }
 	
 }

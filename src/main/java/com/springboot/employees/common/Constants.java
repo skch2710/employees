@@ -42,4 +42,6 @@ public final class Constants {
 	public static final String SALARY = "salary";
 	public static final String START_WITH = "startWith";
 	
+	public static final String ACCESS_DENIED = "You are not access to this resorce.";
+	
 }

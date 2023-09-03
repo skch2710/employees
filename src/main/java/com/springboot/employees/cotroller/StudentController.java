@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,7 @@ public class StudentController {
 	}
 	
 	@PostMapping("/drop-search")
+	@PreAuthorize("hasAnyAuthority('Super User','Admin')")
 	public ResponseEntity<?> searchDropStudent(@RequestBody StudentDropSearch search) {
 		return ResponseEntity.ok(studentService.searchDropStudent(search));
 	}
@@ -67,6 +69,7 @@ public class StudentController {
 	}
 	
 	@PostMapping("/download-student-excel")
+	@PreAuthorize("hasAnyAuthority('Super User')")
 	public ResponseEntity<?> downloadStudentExcel(@RequestBody StudentSearch search) {
 		try {
 			ByteArrayOutputStream outputStream = studentService.downloadStudentExcel(search);
@@ -88,6 +91,7 @@ public class StudentController {
 	}
 
 	@PostMapping("/zip-download")
+	@PreAuthorize("hasAnyAuthority('Super User')")
 	public ResponseEntity<?> downloadZip(@RequestBody StudentSearch search) throws DocumentException {
 		try {
 			String zipFileName = "files.zip";
@@ -112,6 +116,7 @@ public class StudentController {
 	}
 
 	@PostMapping("/generate-pdf")
+	@PreAuthorize("hasAnyAuthority('Super User')")
 	public ResponseEntity<?> generatePdf(@RequestBody StudentSearch search) throws DocumentException {
 		try {
 			ByteArrayOutputStream outputStream = studentService.generatePdfWithTable(search);
