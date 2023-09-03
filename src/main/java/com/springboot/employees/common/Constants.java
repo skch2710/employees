@@ -43,5 +43,11 @@ public final class Constants {
 	public static final String START_WITH = "startWith";
 	
 	public static final String ACCESS_DENIED = "You are not access to this resorce.";
+	public static final String CURRENCY_FORMAT = "₹ #,##0.00";
+	public static final String CURRENCY_FORMAT_NEGITIVE = "₹ #,##0.00; ₹ (#,##0.00)";
+	public static final String NUMBER_FORMAT = "#,##0.00";
+	public static final String NUMBER_FORMAT_NEGITIVE = "#,##0.00; (#,##0.00)";
+	public static final String PERCENTAGE_FORMAT = "0.00\\%";
+	public static final String PERCENTAGE_FORMAT_NEGITIVE = "0.00\\%; (0.00\\%)";
 	
 }

@@ -281,10 +281,10 @@ public class StudentServiceImpl implements StudentService {
 			headerFont.setFontHeightInPoints((short) 12);
 			headerCellStyle.setFont(headerFont);
 
-			CellStyle currencyCellStyle = workbook.createCellStyle();
-			DataFormat currencyDataFormat = workbook.createDataFormat();
-			currencyCellStyle.setDataFormat(currencyDataFormat.getFormat("₹ #,##0.00"));
-
+//			CellStyle currencyCellStyle = workbook.createCellStyle();
+//			DataFormat currencyDataFormat = workbook.createDataFormat();
+//			currencyCellStyle.setDataFormat(currencyDataFormat.getFormat("₹ #,##0.00"));
+			
 			// Write the records to the Excel sheet
 			String[] HEADERs = { "Full Name", "Email ID", "DOB", "Mobile Number", "Salary", "From Date", "To Date" };
 
@@ -307,7 +307,7 @@ public class StudentServiceImpl implements StudentService {
 				row.createCell(2).setCellValue(Utility.dateConvert(studentDTO.getDob()));
 				row.createCell(3).setCellValue(Utility.nullChech(studentDTO.getMobileNumber()));
 				Cell cell4 = row.createCell(4);
-				cell4.setCellStyle(currencyCellStyle);
+				cell4.setCellStyle(Utility.cellStyle(workbook, Constants.PERCENTAGE_FORMAT_NEGITIVE));
 				cell4.setCellValue(Utility.numberConvert(studentDTO.getSalary()));
 				row.createCell(5).setCellValue(Utility.dateConvert(studentDTO.getFromDate()));
 				row.createCell(6).setCellValue(Utility.dateConvert(studentDTO.getToDate()));
