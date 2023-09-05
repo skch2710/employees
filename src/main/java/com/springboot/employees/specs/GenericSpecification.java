@@ -61,6 +61,11 @@ public class GenericSpecification {
 				case "in":
 					tempSpec = findByIn(entry.getKey(), (List<Long>) entryFilter.getValue());
 					break;
+				case "in_null":
+					tempSpec = findByIn(entry.getKey(), (List<Long>) entryFilter.getValue());
+					Specification<T> tempSpecNull = findByNull(entry.getKey());
+					tempSpec = tempSpec.or(tempSpecNull);
+					break;
 				case "stringIn":
 					tempSpec = findByStringIn(entry.getKey(), (List<String>) entryFilter.getValue());
 					break;
@@ -72,11 +77,12 @@ public class GenericSpecification {
 				case "betweenTimeStamp":
 		        	  Map<String, String> timeStampMap = (Map<String, String>) entryFilter.getValue();
 		              tempSpec = findByInBetweenTimeStamp(entry.getKey(),timeStampMap.get(Constants.START_DATE), timeStampMap.get(Constants.END_DATE));
-		              break;
+		            break;
 				case "!=":
 					tempSpec = findByNotEquals(entry.getKey(), entryFilter.getValue());
 //					 return criteriaBuilder.notEqual(root.get(criteria.getKey()),
 //					 criteria.getValue());
+					break;
 				case "<":
 					tempSpec = findByLessThan(entry.getKey(), entryFilter.getValue());
 					break;
@@ -97,6 +103,9 @@ public class GenericSpecification {
 		              break;
 				case "startWith":
 					tempSpec = findByStartWith(entry.getKey(), entryFilter.getValue());
+					break;
+				case "null":
+					tempSpec = findByNull(entry.getKey());
 					break;
 				case "betweenDate":
 					SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);
@@ -441,6 +450,20 @@ public class GenericSpecification {
 	private static <T> Specification<T> findByStringIn(String columnName, List<String> value) {
 		return (rt, qry, cb) -> {
 			return cb.in(rt.get(columnName)).value(castToRequiredType2(rt.get(columnName).getJavaType(), value));
+		};
+	}
+	
+	/**
+	 * 
+	 * Find by Null.
+	 * 
+	 * @param <T>        the generic type
+	 * @param columnName the column name
+	 * @return the specification
+	 */
+	private static <T> Specification<T> findByNull(String columnName) {
+		return (rt, qry, cb) -> {
+			return cb.and(rt.get(columnName).isNull());
 		};
 	}
 

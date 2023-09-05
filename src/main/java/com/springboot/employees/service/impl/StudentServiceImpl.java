@@ -503,6 +503,15 @@ public class StudentServiceImpl implements StudentService {
 				filters.put(Constants.START_WITH, search.getFullName());
 				dynamicFilters.put(Constants.FULL_NAME, filters);
 			}
+			if(search.getDob() != null && !search.getDob().isEmpty()) {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.EQUALS, search.getDob());
+				dynamicFilters.put(Constants.DOB, filters);
+			}else {
+				filters = new HashMap<String, Object>();
+				filters.put(Constants.NULL, search.getDob());
+				dynamicFilters.put(Constants.DOB, filters);
+			}
 			
 			Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
 			List<Student> students = studentDAO.findAll(specification, sort);

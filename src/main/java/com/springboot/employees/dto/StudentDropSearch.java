@@ -13,5 +13,6 @@ public class StudentDropSearch {
 	
 	private List<Long> studentId;
 	private String fullName;
+	private String dob;
 	
 }

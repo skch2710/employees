@@ -27,6 +27,7 @@ public final class Constants {
 	public static final String EMAIL_ID = "emailId";
 	public static final String EQUALS = "=";
 	public static final String BETWEEN_DATE = "betweenDate";
+	public static final String NULL = "null";
 	
 	public static final String DOB = "dob";
 	
