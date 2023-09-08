@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -505,24 +506,29 @@ public class StudentServiceImpl implements StudentService {
 			}
 			if(search.getDob() != null && !search.getDob().isEmpty()) {
 				filters = new HashMap<String, Object>();
-				filters.put(Constants.EQUALS, search.getDob());
-				dynamicFilters.put(Constants.DOB, filters);
-			}else {
-				filters = new HashMap<String, Object>();
-				filters.put(Constants.NULL, search.getDob());
+				filters.put(Constants.BETWEEN_DATE, search.getDob());
 				dynamicFilters.put(Constants.DOB, filters);
 			}
 			
-			Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
-			List<Student> students = studentDAO.findAll(specification, sort);
+//			filters = new HashMap<String, Object>();
+//			filters.put("gte_null", Utility.dateConvert(new Date()));
+//			dynamicFilters.put(Constants.DOB, filters);
+//				else {
+//				filters = new HashMap<String, Object>();
+//				filters.put(Constants.NULL, search.getDob());
+//				dynamicFilters.put(Constants.DOB, filters);
+//			}
 			
+			Specification<Student> specification = GenericSpecification.getSpecification(dynamicFilters);
+//			List<Student> students = studentDAO.findAll(specification, sort);
+			List<StudentDTO> studentDTOs = MAPPER.fromStudentModel(studentDAO.findAll(specification, sort));
 			result = new Result();
 			
-			if(students.size()==0) {
+			if(studentDTOs.size()==0) {
 				result.setStatusCode(HttpStatus.NOT_FOUND.value());
 				result.setErrorMessage("NO RESULT FOUND.");
 			}else {
-				result.setData(students);
+				result.setData(studentDTOs);
 				result.setStatusCode(HttpStatus.OK.value());
 				result.setSuccessMessage("Getting Student Details.");
 			}

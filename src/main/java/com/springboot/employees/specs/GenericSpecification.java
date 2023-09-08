@@ -3,7 +3,11 @@ package com.springboot.employees.specs;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,16 +59,29 @@ public class GenericSpecification {
 				case "=":
 					tempSpec = findByEquals(entry.getKey(), entryFilter.getValue());
 					break;
+				case "equal_null":
+					tempSpec = findByEquals(entry.getKey(), entryFilter.getValue());
+					Specification<T> equalNull = findByNull(entry.getKey());
+					tempSpec = tempSpec.or(equalNull);
+					break;
 				case "contains":
 					tempSpec = findByContains(entry.getKey(), entryFilter.getValue());
 					break;
 				case "in":
 					tempSpec = findByIn(entry.getKey(), (List<Long>) entryFilter.getValue());
 					break;
+				case "not_in":
+					tempSpec = findByNotIn(entry.getKey(), (List<Long>) entryFilter.getValue());
+					break;
 				case "in_null":
 					tempSpec = findByIn(entry.getKey(), (List<Long>) entryFilter.getValue());
 					Specification<T> tempSpecNull = findByNull(entry.getKey());
 					tempSpec = tempSpec.or(tempSpecNull);
+					break;
+				case "not_in_null":
+					tempSpec = findByNotIn(entry.getKey(), (List<Long>) entryFilter.getValue());
+					Specification<T> tempNull = findByNull(entry.getKey());
+					tempSpec = tempSpec.or(tempNull);
 					break;
 				case "stringIn":
 					tempSpec = findByStringIn(entry.getKey(), (List<String>) entryFilter.getValue());
@@ -80,8 +97,11 @@ public class GenericSpecification {
 		            break;
 				case "!=":
 					tempSpec = findByNotEquals(entry.getKey(), entryFilter.getValue());
-//					 return criteriaBuilder.notEqual(root.get(criteria.getKey()),
-//					 criteria.getValue());
+					break;
+				case "not_equal_null":
+					tempSpec = findByNotEquals(entry.getKey(), entryFilter.getValue());
+					Specification<T> specNull = findByNull(entry.getKey());
+					tempSpec = tempSpec.or(specNull);
 					break;
 				case "<":
 					tempSpec = findByLessThan(entry.getKey(), entryFilter.getValue());
@@ -94,6 +114,11 @@ public class GenericSpecification {
 					break;
 				case ">=":
 					tempSpec = findByGreaterThanOrEqual(entry.getKey(), entryFilter.getValue());
+					break;
+				case "gte_null":
+					tempSpec = findByGreaterThanOrEqual(entry.getKey(), entryFilter.getValue());
+					Specification<T> nullSpec = findByNull(entry.getKey());
+					tempSpec = tempSpec.or(nullSpec);
 					break;
 				case "gte":
 		              tempSpec = findByGreaterThanOrEqualObject(entry.getKey(),entryFilter.getValue());
@@ -108,23 +133,35 @@ public class GenericSpecification {
 					tempSpec = findByNull(entry.getKey());
 					break;
 				case "betweenDate":
-					SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);
-					Date date = formatter.parse(entry.getValue().get("betweenDate").toString());
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(date);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					Date startDate = cal.getTime();
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTime(date);
-					calendar.set(Calendar.HOUR_OF_DAY, 23);
-					calendar.set(Calendar.MINUTE, 59);
-					calendar.set(Calendar.SECOND, 59);
-					calendar.set(Calendar.MILLISECOND, 999);
-					Date endDate = calendar.getTime();
-					tempSpec = findDateByInBetween(entry.getKey(), startDate, endDate);
+//					SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);
+//					Date date = formatter.parse(entry.getValue().get("betweenDate").toString());
+//					Calendar cal = Calendar.getInstance();
+//					cal.setTime(date);
+//					cal.set(Calendar.HOUR_OF_DAY, 0);
+//					cal.set(Calendar.MINUTE, 0);
+//					cal.set(Calendar.SECOND, 0);
+//					cal.set(Calendar.MILLISECOND, 0);
+//					Date startDate = cal.getTime();
+//					Calendar calendar = Calendar.getInstance();
+//					calendar.setTime(date);
+//					calendar.set(Calendar.HOUR_OF_DAY, 23);
+//					calendar.set(Calendar.MINUTE, 59);
+//					calendar.set(Calendar.SECOND, 59);
+//					calendar.set(Calendar.MILLISECOND, 999);
+//					Date endDate = calendar.getTime();
+					
+					String dateString = entry.getValue().get("betweenDate").toString();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+					LocalDate localDate = LocalDate.parse(dateString, formatter);
+					LocalDateTime startDateTime = localDate.atStartOfDay();
+					LocalDateTime endDateTime = localDate.atTime(LocalTime.MAX);
+					// Convert LocalDateTime objects to Date objects if needed
+//					Date startDate = Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant());
+//					Date endDate = Date.from(endDateTime.atZone(ZoneId.systemDefault()).toInstant());
+					System.out.println(">>>>>::"+startDateTime);
+					System.out.println(">>>>>::"+endDateTime);
+					
+					tempSpec = findDateByInBetween(entry.getKey(), startDateTime, endDateTime);
 					break;
 				}
 				spec = spec != null ? Specification.where(spec).and(tempSpec) : tempSpec;
@@ -163,6 +200,9 @@ public class GenericSpecification {
 				case "stringIn":
 					tempSpec = findByStringIn(entry.getKey(), (List<String>) entryFilter.getValue());
 					break;
+				case "stringNotIn":
+					tempSpec = findByStringNotIn(entry.getKey(), (List<String>) entryFilter.getValue());
+					break;
 				case "between":
 					Map<String, String> dateMap = (Map<String, String>) entryFilter.getValue();
 					tempSpec = findByInBetween(entry.getKey(), dateMap.get(Constants.START_DATE),
@@ -174,8 +214,6 @@ public class GenericSpecification {
 		              break;
 				case "!=":
 					tempSpec = findByNotEquals(entry.getKey(), entryFilter.getValue());
-//					 return criteriaBuilder.notEqual(root.get(criteria.getKey()),
-//					 criteria.getValue());
 				case "<":
 					tempSpec = findByLessThan(entry.getKey(), entryFilter.getValue());
 					break;
@@ -186,6 +224,9 @@ public class GenericSpecification {
 					tempSpec = findByLessThanOrEqual(entry.getKey(), entryFilter.getValue());
 					break;
 				case ">=":
+					tempSpec = findByGreaterThanOrEqual(entry.getKey(), entryFilter.getValue());
+					break;
+				case "gte_null":
 					tempSpec = findByGreaterThanOrEqual(entry.getKey(), entryFilter.getValue());
 					break;
 				case "gte":
@@ -359,6 +400,12 @@ public class GenericSpecification {
 			return cb.between(rt.get(columnName), convertToDateandTime(startDate), convertToDateandTime(endDate));
 		};
 	}
+	
+	private static <T> Specification<T> findDateByInBetween(String columnName, LocalDateTime startDate, LocalDateTime endDate) {
+		return (rt, qry, cb) -> {
+			return cb.between(rt.get(columnName), convertToLocalDateandTime(startDate), convertToLocalDateandTime(endDate));
+		};
+	}
 
 	/**
 	 * Convert to date.
@@ -420,7 +467,7 @@ public class GenericSpecification {
 	private static <T> Specification<T> findByNotEquals(String columnName, Object value) {
 		return (rt, qry, cb) -> {
 //      System.out.println(castToRequiredType(rt.get(columnName).getJavaType(), value));
-			return cb.equal(rt.get(columnName), castToRequiredType(rt.get(columnName).getJavaType(), value));
+			return cb.notEqual(rt.get(columnName), castToRequiredType(rt.get(columnName).getJavaType(), value));
 		};
 	}
 	
@@ -437,6 +484,20 @@ public class GenericSpecification {
 			return cb.in(rt.get(columnName)).value(castToRequiredType1(rt.get(columnName).getJavaType(), value));
 		};
 	}
+	
+	/**
+	 * Find by Not in.
+	 *
+	 * @param <T>        the generic type
+	 * @param columnName the column name
+	 * @param value      the value
+	 * @return the specification
+	 */
+	private static <T> Specification<T> findByNotIn(String columnName, List<Long> value) {
+		return (rt, qry, cb) -> {
+			return cb.not(cb.in(rt.get(columnName)).value(castToRequiredType1(rt.get(columnName).getJavaType(), value)));
+		};
+	}
 
 	/**
 	 * 
@@ -450,6 +511,21 @@ public class GenericSpecification {
 	private static <T> Specification<T> findByStringIn(String columnName, List<String> value) {
 		return (rt, qry, cb) -> {
 			return cb.in(rt.get(columnName)).value(castToRequiredType2(rt.get(columnName).getJavaType(), value));
+		};
+	}
+	
+	/**
+	 * 
+	 * Find by string Not in.
+	 * 
+	 * @param <T>        the generic type
+	 * @param columnName the column name
+	 * @param value      the value
+	 * @return the specification
+	 */
+	private static <T> Specification<T> findByStringNotIn(String columnName, List<String> value) {
+		return (rt, qry, cb) -> {
+			return cb.not(cb.in(rt.get(columnName)).value(castToRequiredType2(rt.get(columnName).getJavaType(), value)));
 		};
 	}
 	
@@ -492,6 +568,19 @@ public class GenericSpecification {
 		}
 		return ts;
 	}
+	
+	private static Timestamp convertToLocalDateandTime(LocalDateTime value) {
+		Timestamp ts = null;
+		try {
+			ts = Timestamp.valueOf(value);
+
+		} catch (Exception e) {
+			log.error("Error in findDateByInBetween :: ", e);
+		}
+		return ts;
+	}
+	
+	
 
 	/**
 	 * Cast to required type.

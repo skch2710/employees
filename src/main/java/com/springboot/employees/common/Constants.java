@@ -8,16 +8,25 @@ public final class Constants {
 	public static final String SATHISH_KUMAR = "ch sathish kumar";
 	public static final Long MONTHS = 12L;
 	public static final String FIRST_NAME = "firstName";
-	public final static String NOTEQUALS = "!=";
+	
+	public static final String EQUALS = "=";
+	public final static String EQUALS_NULL = "equal_null";
+	public final static String NOT_EQUALS = "!=";
+	public final static String NOT_EQUALS_NULL = "not_equal_null";
 	public final static String LIKE = "contains";
 	public final static String IN = "in";
+	public final static String NOT_IN = "not_in";
+	public final static String IN_NULL = "in_null";
+	public final static String NOT_IN_NULL = "not_in_null";
 	public final static String STRING_IN = "stringIn";
+	public final static String STRING_NOT_IN = "stringNotIn";
 	public final static String BETWEEN = "between";
 	public final static String LESS_THAN = "<";
 	public final static String GREATER_THAN = ">";
 	public final static String LESS_THAN_OR_EQUAL = "<=";
 	public final static String GREATER_THAN_OR_EQUAL = ">=";
 	public final static String GREATER_THAN_EQUAL = "gte";
+	public final static String GTE_NULL = "gte_null";
 	public final static String LESS_THAN_EQUAL = "lte";
 	public static final String DATE_FORMAT = "MM/dd/yyyy";
 	public final static String TIME_STAMP_FORMAT = "MM/dd/yyyy HH:mm:ss.SSS";
@@ -25,7 +34,7 @@ public final class Constants {
 	public static final String END_DATE = "endDate";
 	public static final String EMP_ID = "empId";
 	public static final String EMAIL_ID = "emailId";
-	public static final String EQUALS = "=";
+	
 	public static final String BETWEEN_DATE = "betweenDate";
 	public static final String NULL = "null";
 	

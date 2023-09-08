@@ -32,8 +32,9 @@ import com.springboot.employees.util.Utility;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
-@RequestMapping("/api/v1/student")
-@SecurityRequirement(name = "bearerAuth")
+//@RequestMapping("/api/v1/student")
+@RequestMapping("/student")
+//@SecurityRequirement(name = "bearerAuth")
 public class StudentController {
 
 	@Autowired
@@ -52,7 +53,7 @@ public class StudentController {
 	}
 	
 	@PostMapping("/drop-search")
-	@PreAuthorize("hasAnyAuthority('Super User','Admin')")
+//	@PreAuthorize("hasAnyAuthority('Super User','Admin')")
 	public ResponseEntity<?> searchDropStudent(@RequestBody StudentDropSearch search) {
 		return ResponseEntity.ok(studentService.searchDropStudent(search));
 	}
@@ -69,7 +70,7 @@ public class StudentController {
 	}
 	
 	@PostMapping("/download-student-excel")
-	@PreAuthorize("hasAnyAuthority('Super User')")
+//	@PreAuthorize("hasAnyAuthority('Super User')")
 	public ResponseEntity<?> downloadStudentExcel(@RequestBody StudentSearch search) {
 		try {
 			ByteArrayOutputStream outputStream = studentService.downloadStudentExcel(search);
