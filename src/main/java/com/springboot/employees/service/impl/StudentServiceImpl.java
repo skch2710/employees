@@ -1,29 +1,36 @@
 package com.springboot.employees.service.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -36,6 +43,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.springboot.employees.common.Constants;
 import com.springboot.employees.dao.StudentDAO;
+import com.springboot.employees.dto.BatchInsertionTask;
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.SearchResult;
 import com.springboot.employees.dto.StudentDTO;
@@ -541,4 +549,76 @@ public class StudentServiceImpl implements StudentService {
 		return result;
 	}
 
+	
+	@Override
+	public Result batchUploadExcel(MultipartFile file) throws ParseException {
+		Result result = null;
+		XSSFWorkbook workbook = null;
+		try {
+			InputStream inputStream = file.getInputStream();
+			workbook = new XSSFWorkbook(inputStream);
+			XSSFSheet sheet = workbook.getSheetAt(0); // Assuming the data is on the first sheet
+
+			long intialTime = System.currentTimeMillis();
+
+			int batchSize = 50; // Declare and set the batch size
+
+			List<Student> recordsToSave = new ArrayList<>();
+
+			DataFormatter dataFormatter = new DataFormatter();
+
+			for (Row row : sheet) {
+				if (row.getRowNum() != 0) { // Skip header row
+					Student record = new Student();
+					record.setFullName(dataFormatter.formatCellValue(row.getCell(0)));
+					record.setEmailId(dataFormatter.formatCellValue(row.getCell(1)));
+					record.setDob(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(2))));
+					record.setMobileNumber(dataFormatter.formatCellValue(row.getCell(3)));
+					record.setSalary(Utility.numberConvert(dataFormatter.formatCellValue(row.getCell(4))));
+					record.setFromDate(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(5))));
+					record.setToDate(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(6))));
+
+					recordsToSave.add(record);
+
+					if (recordsToSave.size() % batchSize == 0) { // Use the batch size variable
+						saveRecordsInBatch(recordsToSave);
+						recordsToSave.clear();
+					}
+				}
+			}
+
+			if (!recordsToSave.isEmpty()) {
+				saveRecordsInBatch(recordsToSave);
+			}
+
+			long finalTime = System.currentTimeMillis();
+			System.out.println("???>>>???::: TotalTime : " + (finalTime - intialTime));
+
+		} catch (IOException e) {
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		return null;
+	}
+
+//	@Autowired
+//	private StudentBatch studentBatch;
+
+	private void saveRecordsInBatch(List<Student> records) {
+		BatchInsertionTask saveRecordsTask = new BatchInsertionTask(records, studentDAO);
+//		BatchInsertionTask saveRecordsTask = new BatchInsertionTask(records, studentBatch);
+
+		ExecutorService executorService = Executors.newFixedThreadPool(4); 
+		// Specify the number of threads in the pool
+		executorService.execute(saveRecordsTask);
+
+		// Shutdown the executor service when you're done
+		executorService.shutdown();
+	}
+	
 }

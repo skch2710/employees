@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
@@ -18,7 +19,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.itextpdf.text.DocumentException;
 import com.springboot.employees.dto.Result;
@@ -28,8 +31,6 @@ import com.springboot.employees.dto.StudentSearch;
 import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.service.StudentService;
 import com.springboot.employees.util.Utility;
-
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 //@RequestMapping("/api/v1/student")
@@ -92,7 +93,6 @@ public class StudentController {
 	}
 
 	@PostMapping("/zip-download")
-	@PreAuthorize("hasAnyAuthority('Super User')")
 	public ResponseEntity<?> downloadZip(@RequestBody StudentSearch search) throws DocumentException {
 		try {
 			String zipFileName = "files.zip";
@@ -135,5 +135,10 @@ public class StudentController {
 		} catch (IOException e) {
 			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@PostMapping(path = "/batch-upload", consumes = { "application/json", "multipart/form-data" })
+	public ResponseEntity<?> uploadExcel(@RequestParam("file") MultipartFile file) throws ParseException {
+		return ResponseEntity.ok(studentService.batchUploadExcel(file));
 	}
 }

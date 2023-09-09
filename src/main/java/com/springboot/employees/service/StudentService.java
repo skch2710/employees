@@ -1,7 +1,10 @@
 package com.springboot.employees.service;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.springboot.employees.dto.Result;
 import com.springboot.employees.dto.StudentDTO;
@@ -19,5 +22,7 @@ public interface StudentService {
 	ByteArrayOutputStream downloadStudentExcel(StudentSearch search);
 	
 	Result searchDropStudent(StudentDropSearch search);
+	
+	Result batchUploadExcel(MultipartFile file) throws ParseException;
 	
 }
