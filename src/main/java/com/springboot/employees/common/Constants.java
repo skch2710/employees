@@ -60,4 +60,10 @@ public final class Constants {
 	public static final String PERCENTAGE_FORMAT = "0.00\\%";
 	public static final String PERCENTAGE_FORMAT_NEGITIVE = "0.00\\%; (0.00\\%)";
 	
+	public static final String ZIP_TYPE = "application/zip";
+	public static final String EXCEL_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	public static final String PDF_TYPE = "application/pdf";
+	public static final String JPG_TYPE = "image/jpeg";
+	public static final String PNG_TYPE = "image/png";
+	
 }

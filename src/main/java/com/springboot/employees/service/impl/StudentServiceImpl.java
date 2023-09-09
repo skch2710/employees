@@ -218,16 +218,17 @@ public class StudentServiceImpl implements StudentService {
 		try {
 			List<Student> students = batchInsertRecords(studentDTOs);
 			
-			if(!students.isEmpty()) {
-				
-				ByteArrayOutputStream imageStream = Utility.readImageToByteArrayOutputStream(Constants.IMAGE_LOGO);
-				
-				students.forEach(student->{
-					Map<String, Object> model = new HashMap<>();
-					model.put("fullName", student.getFullName());
-					emailService.sendEmailWelcome(model, student.getEmailId(),imageStream);
-				});
-			}
+//			if(!students.isEmpty()) {
+//				ByteArrayOutputStream bos = Utility.readImageToByteArrayOutputStream("src/main/resources/images/ex.zip");
+//				students.forEach(student->{
+//					Map<String, Object> model = new HashMap<>();
+//					model.put("fullName", student.getFullName());
+//					model.put("toMail", student.getEmailId());
+//					model.put("type", Constants.ZIP_TYPE);
+//					model.put("fileName", "ex.zip");
+//					emailService.sendEmailAttachment(model, bos);
+//				});
+//			}
 
 			result = new Result(students);
 			result.setStatusCode(HttpStatus.OK.value());

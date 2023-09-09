@@ -142,6 +142,39 @@ public class EmailService {
 			log.error(e.getMessage());
 		}
 	}
+	
+	/**
+	 * method for attachments.
+	 * 
+	 * @param model
+	 * @param toMail
+	 * @param htmlFile
+	 * @param strSubject
+	 * @param bos
+	 */
+	public void sendEmailAttachment(Map<String, Object> model, String htmlFile, String strSubject,
+			ByteArrayOutputStream bos) {
+
+			MimeMessage message = mailSender.createMimeMessage();
+			try {
+				MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+						StandardCharsets.UTF_8.name());
+
+				helper.setTo(model.get("toMail").toString());
+				helper.setText(createTemplete(htmlFile, model), true);
+				helper.setSubject(strSubject);
+				helper.setFrom(fromEmail, personal_message);
+
+				// Attach the file
+				ByteArrayDataSource dataSource = new ByteArrayDataSource(bos.toByteArray(), model.get("type").toString()); 
+				helper.addAttachment(model.get("fileName").toString(), dataSource);
+
+				mailSender.send(message);
+
+			} catch (MessagingException | UnsupportedEncodingException e) {
+				log.error(e.getMessage());
+			}
+		}
 
 	/**
 	 * Send email welcome.
@@ -172,5 +205,10 @@ public class EmailService {
 	public void sendEmailWelcome(Map<String, Object> model, String toMail,
 			ByteArrayOutputStream imageStream) {
 		sendEmail(model, toMail, "welcome.html", "Welcome to Employee - sathish",imageStream);
+	}
+	
+	@Async
+	public void sendEmailAttachment(Map<String, Object> model, ByteArrayOutputStream bos) {
+		sendEmailAttachment(model, "welcome.html", "Welcome to Employee - sathish",bos);
 	}
 }
