@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -140,5 +141,26 @@ public class StudentController {
 	@PostMapping(path = "/batch-upload", consumes = { "application/json", "multipart/form-data" })
 	public ResponseEntity<?> uploadExcel(@RequestParam("file") MultipartFile file) throws ParseException {
 		return ResponseEntity.ok(studentService.batchUploadExcel(file));
+	}
+	
+	@PostMapping("/download-error-excel")
+	public ResponseEntity<?> downloadError(@RequestBody List<StudentDTO> studentDTOs) {
+		try {
+			ByteArrayOutputStream outputStream = studentService.downloadError(studentDTOs);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			headers.setContentDisposition(ContentDisposition.attachment().filename("Student Error Sheet.xlsx").build());
+
+			InputStreamResource inputStreamResource = new InputStreamResource(
+					new ByteArrayInputStream(outputStream.toByteArray()));
+
+			// Flush the output stream
+			outputStream.flush();
+
+			return ResponseEntity.ok().headers(headers).body(inputStreamResource);
+		} catch (IOException e) {
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

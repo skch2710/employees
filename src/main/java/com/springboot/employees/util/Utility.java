@@ -158,4 +158,16 @@ public class Utility {
 		cellStyle.setAlignment(HorizontalAlignment.RIGHT);
 		return cellStyle;
 	}
+	
+	public static String stringCheck(String input) {
+		return !input.isEmpty() ? input : null;
+	}
+	
+	public static Object convertNum(String value) {
+		if (value != null && !value.isEmpty() && RegexHelper.isDecimal(value)) {
+			return Double.parseDouble(value);
+		} else {
+			return value == null ? "" : value;
+		}
+	}
 }

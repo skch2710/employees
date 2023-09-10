@@ -25,4 +25,5 @@ public interface StudentService {
 	
 	Result batchUploadExcel(MultipartFile file) throws ParseException;
 	
+	ByteArrayOutputStream downloadError(List<StudentDTO> studentDTOs);
 }

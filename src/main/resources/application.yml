@@ -52,7 +52,7 @@ spring:
 #      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
 #      naming:
 #        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: true
+    show-sql: false
 
   mail:
     host: smtp.office365.com

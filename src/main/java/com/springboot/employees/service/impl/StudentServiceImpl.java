@@ -575,7 +575,7 @@ public class StudentServiceImpl implements StudentService {
 					
 					StringBuilder errorMessage = new StringBuilder();
 					
-					Student record = new Student();
+					StudentDTO record = new StudentDTO();
 					
 					String fullName = dataFormatter.formatCellValue(row.getCell(0));
 					if(fullName != null && !fullName.isEmpty() && RegexHelper.isAlphaNumeric(fullName)) {
@@ -601,10 +601,10 @@ public class StudentServiceImpl implements StudentService {
 					
 					String dob = dataFormatter.formatCellValue(row.getCell(2));
 					if(dob != null && dob.isEmpty() || RegexHelper.isDate(dob)) {
-						record.setDob(Utility.convertDate(dob));
+						record.setDob(Utility.stringCheck(dob));
 					}else {
 						errorMessage.append("DOB is Not a valid.");
-						record.setDob(Utility.convertDate(dob));
+						record.setDob(Utility.stringCheck(dob));
 					}
 					
 					String mobileNumber = dataFormatter.formatCellValue(row.getCell(3));
@@ -616,36 +616,35 @@ public class StudentServiceImpl implements StudentService {
 					}
 					
 					String salary = dataFormatter.formatCellValue(row.getCell(4));
-					if(salary != null && salary.isEmpty() || RegexHelper.isNumeric(mobileNumber)) {
-						record.setSalary(Utility.numberConvert(salary));
+					if(salary != null && salary.isEmpty() || RegexHelper.isDecimal(salary)) {
+						record.setSalary(salary);
 					}else {
 						errorMessage.append("Salary is Not a valid.");
-						record.setMobileNumber(salary);
+						record.setSalary(salary);
 					}
 					
 					String fromDate = dataFormatter.formatCellValue(row.getCell(5));
 					if(fromDate != null && fromDate.isEmpty() || RegexHelper.isDate(fromDate)) {
-						record.setFromDate(Utility.convertDate(fromDate));
+						record.setFromDate(Utility.stringCheck(fromDate));
 					}else {
 						errorMessage.append("From Date is Not a valid.");
-						record.setFromDate(Utility.convertDate(fromDate));
+						record.setFromDate(Utility.stringCheck(fromDate));
 					}
 					
 					String toDate = dataFormatter.formatCellValue(row.getCell(6));
 					if(toDate != null && toDate.isEmpty() || RegexHelper.isDate(toDate)) {
-						record.setToDate(Utility.convertDate(toDate));
+						record.setToDate(Utility.stringCheck(toDate));
 					}else {
 						errorMessage.append("To Date is Not a valid.");
-						record.setToDate(Utility.convertDate(toDate));
+						record.setToDate(Utility.stringCheck(toDate));
 					}
 					
 					if(errorMessage.length()==0) {
-						recordsToSave.add(record);
+						recordsToSave.add(MAPPER.fromStudentDTO(record));
 						recordsSavedCount++;
 					}else {
-						StudentDTO errorRecord = MAPPER.fromStudentModel(record);
-						errorRecord.setErrorMessage(errorMessage.toString());
-						errorList.add(errorRecord);
+						record.setErrorMessage(errorMessage.toString());
+						errorList.add(record);
 					}
 
 					if (recordsToSave.size() % batchSize == 0) { // Use the batch size variable
@@ -692,6 +691,75 @@ public class StudentServiceImpl implements StudentService {
 
 		// Shutdown the executor service when you're done
 		executorService.shutdown();
+	}
+
+	@Override
+	public ByteArrayOutputStream downloadError(List<StudentDTO> studentDTOs) {
+		SXSSFWorkbook workbook;
+		ByteArrayOutputStream baos;
+		try {
+			workbook = new SXSSFWorkbook();
+			SXSSFSheet sheet = workbook.createSheet("Error Sheet");
+
+			// Define cell styles for header
+			CellStyle headerCellStyle = workbook.createCellStyle();
+			headerCellStyle.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+			headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			Font headerFont = workbook.createFont();
+			headerFont.setColor(IndexedColors.WHITE.getIndex());
+			headerFont.setBold(true);
+			headerFont.setFontHeightInPoints((short) 12);
+			headerCellStyle.setFont(headerFont);
+
+			// Write the records to the Excel sheet
+			String[] HEADERs = { "Full Name", "Email ID", "DOB", "Mobile Number", "Salary", "From Date", "To Date","Error Message" };
+
+			Row row = sheet.createRow(0);
+
+			int cellId = 0;
+			for (String string : HEADERs) {
+				Cell cell = row.createCell(cellId++);
+				cell.setCellValue(string);
+				cell.setCellStyle(headerCellStyle); // Apply the header cell style
+			}
+
+			sheet.createFreezePane(0, 1); // Freezing Headers
+
+			int rowid = 1;
+			for (StudentDTO studentDTO : studentDTOs) {
+				row = sheet.createRow(rowid++);
+				row.createCell(0).setCellValue(Utility.nullChech(studentDTO.getFullName()));
+				row.createCell(1).setCellValue(Utility.nullChech(studentDTO.getEmailId()));
+				row.createCell(2).setCellValue(Utility.nullChech(studentDTO.getDob()));
+				row.createCell(3).setCellValue(Utility.nullChech(studentDTO.getMobileNumber()));
+				Cell cell4 = row.createCell(4);
+				cell4.setCellStyle(Utility.cellStyle(workbook, Constants.NUMBER_FORMAT));
+				if (Utility.convertNum(studentDTO.getSalary()) instanceof Double) {
+					cell4.setCellValue((Double) Utility.convertNum(studentDTO.getSalary()));
+				}else {
+					cell4.setCellValue((String) Utility.convertNum(studentDTO.getSalary()));
+				}
+				row.createCell(5).setCellValue(Utility.nullChech(studentDTO.getFromDate()));
+				row.createCell(6).setCellValue(Utility.nullChech(studentDTO.getToDate()));
+				row.createCell(7).setCellValue(Utility.nullChech(studentDTO.getErrorMessage()));
+			}
+
+			sheet.setColumnWidth(0, 14 * 256);
+			sheet.setColumnWidth(1, 24 * 256);
+			sheet.setColumnWidth(2, 14 * 256);
+			sheet.setColumnWidth(3, 16 * 256);
+			sheet.setColumnWidth(4, 14 * 256);
+			sheet.setColumnWidth(5, 14 * 256);
+			sheet.setColumnWidth(6, 14 * 256);
+
+			baos = new ByteArrayOutputStream();
+			workbook.write(baos); // Write the workbook to a temporary byte array
+			workbook.close(); // Close the workbook
+		} catch (Exception e) {
+			log.error("Error in create workbook :: ", e);
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return baos;
 	}
 	
 }

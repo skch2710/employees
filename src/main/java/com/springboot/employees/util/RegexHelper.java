@@ -57,6 +57,10 @@ public class RegexHelper {
 	public static Boolean isNumeric(String number) {
 		return number != null && number.matches("^[0-9]*$");
 	}
+	
+	public static boolean isDecimal(String number) {
+	    return number != null && number.matches("[-]?[0-9]+([.][0-9]+)?");
+	}
 
 	public static Boolean isDate(String date) {
 		String datePattern = "^(0[1-9]|1[0-2])/(0[1-9]|1\\d|2\\d|3[01])/\\d{4}$";
