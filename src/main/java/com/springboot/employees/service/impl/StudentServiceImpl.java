@@ -578,65 +578,50 @@ public class StudentServiceImpl implements StudentService {
 					StudentDTO record = new StudentDTO();
 					
 					String fullName = dataFormatter.formatCellValue(row.getCell(0));
-					if(fullName != null && !fullName.isEmpty() && RegexHelper.isAlphaNumeric(fullName)) {
-						record.setFullName(fullName);
-					}else {
+					record.setFullName(fullName);
+					if(fullName == null || fullName.isEmpty() || !RegexHelper.isAlphaNumeric(fullName)) {
 						errorMessage.append("Full Name is Not a valid.");
-						record.setFullName(fullName);
 					}
 					
 					String emailId = dataFormatter.formatCellValue(row.getCell(1));
-					if(emailId != null && !emailId.isEmpty() && RegexHelper.isEmail(emailId)) {
-						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
-						if(emailCheck == null) {
-							record.setEmailId(emailId);
-						}else {
-							errorMessage.append("Email Id is Already Exist.");
-							record.setEmailId(emailId);
-						}
-					}else {
+					record.setEmailId(emailId);
+					if(emailId == null || emailId.isEmpty() || !RegexHelper.isEmail(emailId)) {
 						errorMessage.append("Email Id is Not a valid.");
-						record.setEmailId(emailId);
+					}else {
+						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
+						if(emailCheck != null) {
+							errorMessage.append("Email Id is Already Exist.");
+						}
 					}
 					
 					String dob = dataFormatter.formatCellValue(row.getCell(2));
-					if(dob != null && dob.isEmpty() || RegexHelper.isDate(dob)) {
-						record.setDob(Utility.stringCheck(dob));
-					}else {
+					record.setDob(Utility.stringCheck(dob));
+					if(!dob.isEmpty() && !RegexHelper.isDate(dob)) {
 						errorMessage.append("DOB is Not a valid.");
-						record.setDob(Utility.stringCheck(dob));
 					}
 					
 					String mobileNumber = dataFormatter.formatCellValue(row.getCell(3));
-					if(mobileNumber != null && mobileNumber.isEmpty() || RegexHelper.isNumeric(mobileNumber)) {
-						record.setMobileNumber(mobileNumber);
-					}else {
+					record.setMobileNumber(mobileNumber);
+					if(!mobileNumber.isEmpty() && !RegexHelper.isNumeric(mobileNumber)) {
 						errorMessage.append("Mobile Number is Not a valid.");
-						record.setMobileNumber(mobileNumber);
 					}
 					
 					String salary = dataFormatter.formatCellValue(row.getCell(4));
-					if(salary != null && salary.isEmpty() || RegexHelper.isDecimal(salary)) {
-						record.setSalary(salary);
-					}else {
+					record.setSalary(salary);
+					if(salary != null && !salary.isEmpty() && !RegexHelper.isDecimal(salary)) {
 						errorMessage.append("Salary is Not a valid.");
-						record.setSalary(salary);
 					}
 					
 					String fromDate = dataFormatter.formatCellValue(row.getCell(5));
-					if(fromDate != null && fromDate.isEmpty() || RegexHelper.isDate(fromDate)) {
-						record.setFromDate(Utility.stringCheck(fromDate));
-					}else {
+					record.setFromDate(Utility.stringCheck(fromDate));
+					if(fromDate != null && !fromDate.isEmpty() && !RegexHelper.isDate(fromDate)) {
 						errorMessage.append("From Date is Not a valid.");
-						record.setFromDate(Utility.stringCheck(fromDate));
 					}
 					
 					String toDate = dataFormatter.formatCellValue(row.getCell(6));
-					if(toDate != null && toDate.isEmpty() || RegexHelper.isDate(toDate)) {
-						record.setToDate(Utility.stringCheck(toDate));
-					}else {
+					record.setToDate(Utility.stringCheck(toDate));
+					if(toDate != null && !toDate.isEmpty() && !RegexHelper.isDate(toDate)) {
 						errorMessage.append("To Date is Not a valid.");
-						record.setToDate(Utility.stringCheck(toDate));
 					}
 					
 					if(errorMessage.length()==0) {
