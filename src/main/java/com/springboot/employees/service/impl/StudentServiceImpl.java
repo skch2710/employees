@@ -588,14 +588,12 @@ public class StudentServiceImpl implements StudentService {
 					record.setEmailId(emailId);
 					if(emailId == null || emailId.isEmpty() || !RegexHelper.isEmail(emailId)) {
 						errorMessage.append("Email Id is Not a valid.");
+					}else if(emailIdList.contains(emailId)){
+						errorMessage.append("Email Id is Entered Duplicate.");
 					}else {
-						if(emailIdList.contains(emailId)) {
-							errorMessage.append("Email Id is Entered Duplicate.");
-						}else {
-							Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
-							if(emailCheck != null) {
-								errorMessage.append("Email Id is Already Exist.");
-							}
+						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
+						if(emailCheck != null) {
+							errorMessage.append("Email Id is Already Exist.");
 						}
 						emailIdList.add(emailId);
 					}
