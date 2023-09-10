@@ -25,4 +25,6 @@ public interface StudentDAO extends JpaRepository<Student, Long> {
 	Page<Student> findAll(Specification<Student> spec, Pageable pageable);
 
 	List<Student> findAll(Specification<Student> spec, Sort sort);
+	
+	Student findByEmailIdIgnoreCase(String emailId);
 }

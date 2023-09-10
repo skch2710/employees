@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -26,7 +25,6 @@ import com.springboot.employees.exception.CustomException;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
 public class PdfHelper {
 

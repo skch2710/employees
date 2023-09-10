@@ -56,6 +56,7 @@ import com.springboot.employees.model.Student;
 import com.springboot.employees.service.StudentService;
 import com.springboot.employees.specs.GenericSpecification;
 import com.springboot.employees.util.PdfHelper;
+import com.springboot.employees.util.RegexHelper;
 import com.springboot.employees.util.Utility;
 
 import lombok.extern.slf4j.Slf4j;
@@ -564,21 +565,88 @@ public class StudentServiceImpl implements StudentService {
 			int batchSize = 50; // Declare and set the batch size
 
 			List<Student> recordsToSave = new ArrayList<>();
+			List<StudentDTO> errorList = new ArrayList<>();
+			Long recordsSavedCount = 0L;
 
 			DataFormatter dataFormatter = new DataFormatter();
 
 			for (Row row : sheet) {
 				if (row.getRowNum() != 0) { // Skip header row
+					
+					StringBuilder errorMessage = new StringBuilder();
+					
 					Student record = new Student();
-					record.setFullName(dataFormatter.formatCellValue(row.getCell(0)));
-					record.setEmailId(dataFormatter.formatCellValue(row.getCell(1)));
-					record.setDob(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(2))));
-					record.setMobileNumber(dataFormatter.formatCellValue(row.getCell(3)));
-					record.setSalary(Utility.numberConvert(dataFormatter.formatCellValue(row.getCell(4))));
-					record.setFromDate(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(5))));
-					record.setToDate(Utility.convertDate(dataFormatter.formatCellValue(row.getCell(6))));
-
-					recordsToSave.add(record);
+					
+					String fullName = dataFormatter.formatCellValue(row.getCell(0));
+					if(fullName != null && !fullName.isEmpty() && RegexHelper.isAlphaNumeric(fullName)) {
+						record.setFullName(fullName);
+					}else {
+						errorMessage.append("Full Name is Not a valid.");
+						record.setFullName(fullName);
+					}
+					
+					String emailId = dataFormatter.formatCellValue(row.getCell(1));
+					if(emailId != null && !emailId.isEmpty() && RegexHelper.isEmail(emailId)) {
+						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
+						if(emailCheck == null) {
+							record.setEmailId(emailId);
+						}else {
+							errorMessage.append("Email Id is Already Exist.");
+							record.setEmailId(emailId);
+						}
+					}else {
+						errorMessage.append("Email Id is Not a valid.");
+						record.setEmailId(emailId);
+					}
+					
+					String dob = dataFormatter.formatCellValue(row.getCell(2));
+					if(dob != null && dob.isEmpty() || RegexHelper.isDate(dob)) {
+						record.setDob(Utility.convertDate(dob));
+					}else {
+						errorMessage.append("DOB is Not a valid.");
+						record.setDob(Utility.convertDate(dob));
+					}
+					
+					String mobileNumber = dataFormatter.formatCellValue(row.getCell(3));
+					if(mobileNumber != null && mobileNumber.isEmpty() || RegexHelper.isNumeric(mobileNumber)) {
+						record.setMobileNumber(mobileNumber);
+					}else {
+						errorMessage.append("Mobile Number is Not a valid.");
+						record.setMobileNumber(mobileNumber);
+					}
+					
+					String salary = dataFormatter.formatCellValue(row.getCell(4));
+					if(salary != null && salary.isEmpty() || RegexHelper.isNumeric(mobileNumber)) {
+						record.setSalary(Utility.numberConvert(salary));
+					}else {
+						errorMessage.append("Salary is Not a valid.");
+						record.setMobileNumber(salary);
+					}
+					
+					String fromDate = dataFormatter.formatCellValue(row.getCell(5));
+					if(fromDate != null && fromDate.isEmpty() || RegexHelper.isDate(fromDate)) {
+						record.setFromDate(Utility.convertDate(fromDate));
+					}else {
+						errorMessage.append("From Date is Not a valid.");
+						record.setFromDate(Utility.convertDate(fromDate));
+					}
+					
+					String toDate = dataFormatter.formatCellValue(row.getCell(6));
+					if(toDate != null && toDate.isEmpty() || RegexHelper.isDate(toDate)) {
+						record.setToDate(Utility.convertDate(toDate));
+					}else {
+						errorMessage.append("To Date is Not a valid.");
+						record.setToDate(Utility.convertDate(toDate));
+					}
+					
+					if(errorMessage.length()==0) {
+						recordsToSave.add(record);
+						recordsSavedCount++;
+					}else {
+						StudentDTO errorRecord = MAPPER.fromStudentModel(record);
+						errorRecord.setErrorMessage(errorMessage.toString());
+						errorList.add(errorRecord);
+					}
 
 					if (recordsToSave.size() % batchSize == 0) { // Use the batch size variable
 						saveRecordsInBatch(recordsToSave);
@@ -591,6 +659,11 @@ public class StudentServiceImpl implements StudentService {
 				saveRecordsInBatch(recordsToSave);
 			}
 
+			result = new Result(errorList);
+			result.setStatusCode(HttpStatus.OK.value());
+			result.setErrorMessage("Number of records failed count : "+errorList.size());
+			result.setSuccessMessage("Number of records saved : "+recordsSavedCount);
+			
 			long finalTime = System.currentTimeMillis();
 			System.out.println("???>>>???::: TotalTime : " + (finalTime - intialTime));
 
@@ -603,7 +676,7 @@ public class StudentServiceImpl implements StudentService {
 				throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		return null;
+		return result;
 	}
 
 //	@Autowired

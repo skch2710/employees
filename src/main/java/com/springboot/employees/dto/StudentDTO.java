@@ -25,5 +25,7 @@ public class StudentDTO {
 	private String fromDate;
 	
 	private String toDate;
+	
+	private String errorMessage;
 
 }
