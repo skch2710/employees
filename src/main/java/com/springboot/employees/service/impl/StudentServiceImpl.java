@@ -566,6 +566,7 @@ public class StudentServiceImpl implements StudentService {
 
 			List<Student> recordsToSave = new ArrayList<>();
 			List<StudentDTO> errorList = new ArrayList<>();
+			List<String> emailIdList = new ArrayList<>();
 			Long recordsSavedCount = 0L;
 
 			DataFormatter dataFormatter = new DataFormatter();
@@ -588,10 +589,15 @@ public class StudentServiceImpl implements StudentService {
 					if(emailId == null || emailId.isEmpty() || !RegexHelper.isEmail(emailId)) {
 						errorMessage.append("Email Id is Not a valid.");
 					}else {
-						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
-						if(emailCheck != null) {
-							errorMessage.append("Email Id is Already Exist.");
+						if(emailIdList.contains(emailId)) {
+							errorMessage.append("Email Id is Entered Duplicate.");
+						}else {
+							Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
+							if(emailCheck != null) {
+								errorMessage.append("Email Id is Already Exist.");
+							}
 						}
+						emailIdList.add(emailId);
 					}
 					
 					String dob = dataFormatter.formatCellValue(row.getCell(2));
