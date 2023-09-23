@@ -55,6 +55,7 @@ import com.springboot.employees.mapper.ObjectMapper;
 import com.springboot.employees.model.Student;
 import com.springboot.employees.service.StudentService;
 import com.springboot.employees.specs.GenericSpecification;
+import com.springboot.employees.util.ExcelHelper;
 import com.springboot.employees.util.PdfHelper;
 import com.springboot.employees.util.RegexHelper;
 import com.springboot.employees.util.Utility;
@@ -562,96 +563,110 @@ public class StudentServiceImpl implements StudentService {
 
 			long intialTime = System.currentTimeMillis();
 
-			int batchSize = 50; // Declare and set the batch size
+			List<String> headers = new ArrayList<>(
+					Arrays.asList("Full Name", "Email ID", "DOB", "Mobile Number", "Salary", "From Date", "To Date"));
 
-			List<Student> recordsToSave = new ArrayList<>();
-			List<StudentDTO> errorList = new ArrayList<>();
-			List<String> emailIdList = new ArrayList<>();
-			Long recordsSavedCount = 0L;
+			if (sheet.getPhysicalNumberOfRows() != 0) {
+				if (ExcelHelper.headersCompare(sheet, headers)) {
 
-			DataFormatter dataFormatter = new DataFormatter();
+					int batchSize = 50; // Declare and set the batch size
 
-			for (Row row : sheet) {
-				if (row.getRowNum() != 0) { // Skip header row
-					
-					StringBuilder errorMessage = new StringBuilder();
-					
-					StudentDTO record = new StudentDTO();
-					
-					String fullName = dataFormatter.formatCellValue(row.getCell(0));
-					record.setFullName(fullName);
-					if(fullName == null || fullName.isEmpty() || !RegexHelper.isAlphaNumeric(fullName)) {
-						errorMessage.append("Full Name is Not a valid.");
-					}
-					
-					String emailId = dataFormatter.formatCellValue(row.getCell(1));
-					record.setEmailId(emailId);
-					if(emailId == null || emailId.isEmpty() || !RegexHelper.isEmail(emailId)) {
-						errorMessage.append("Email Id is Not a valid.");
-					}else if(emailIdList.contains(emailId)){
-						errorMessage.append("Email Id is Entered Duplicate.");
-					}else {
-						Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
-						if(emailCheck != null) {
-							errorMessage.append("Email Id is Already Exist.");
+					List<Student> recordsToSave = new ArrayList<>();
+					List<StudentDTO> errorList = new ArrayList<>();
+					List<String> emailIdList = new ArrayList<>();
+					Long recordsSavedCount = 0L;
+
+					DataFormatter dataFormatter = new DataFormatter();
+
+					for (Row row : sheet) {
+						if (row.getRowNum() != 0) { // Skip header row
+
+							StringBuilder errorMessage = new StringBuilder();
+
+							StudentDTO record = new StudentDTO();
+
+							String fullName = dataFormatter.formatCellValue(row.getCell(0));
+							record.setFullName(fullName);
+							if (fullName == null || fullName.isEmpty() || !RegexHelper.isAlphaNumericSpace(fullName)) {
+								errorMessage.append("Full Name is Not a valid.");
+							}
+
+							String emailId = dataFormatter.formatCellValue(row.getCell(1));
+							record.setEmailId(emailId);
+							if (emailId == null || emailId.isEmpty() || !RegexHelper.isEmail(emailId)) {
+								errorMessage.append("Email Id is Not a valid.");
+							} else if (emailIdList.contains(emailId)) {
+								errorMessage.append("Email Id is Entered Duplicate.");
+							} else {
+								Student emailCheck = studentDAO.findByEmailIdIgnoreCase(emailId);
+								if (emailCheck != null) {
+									errorMessage.append("Email Id is Already Exist.");
+								}
+							}
+
+							String dob = dataFormatter.formatCellValue(row.getCell(2));
+							record.setDob(Utility.stringCheck(dob));
+							if (!dob.isEmpty() && !RegexHelper.isDate(dob)) {
+								errorMessage.append("DOB is Not a valid.");
+							}
+
+							String mobileNumber = dataFormatter.formatCellValue(row.getCell(3));
+							record.setMobileNumber(mobileNumber);
+							if (!mobileNumber.isEmpty() && !RegexHelper.isNumeric(mobileNumber)) {
+								errorMessage.append("Mobile Number is Not a valid.");
+							}
+
+							String salary = dataFormatter.formatCellValue(row.getCell(4));
+							record.setSalary(Utility.removeCama(salary));
+							if (salary != null && !salary.isEmpty() && !RegexHelper.isDecimal(salary)) {
+								errorMessage.append("Salary is Not a valid.");
+							}
+
+							String fromDate = dataFormatter.formatCellValue(row.getCell(5));
+							record.setFromDate(Utility.stringCheck(fromDate));
+							if (fromDate != null && !fromDate.isEmpty() && !RegexHelper.isDate(fromDate)) {
+								errorMessage.append("From Date is Not a valid.");
+							}
+
+							String toDate = dataFormatter.formatCellValue(row.getCell(6));
+							record.setToDate(Utility.stringCheck(toDate));
+							if (toDate != null && !toDate.isEmpty() && !RegexHelper.isDate(toDate)) {
+								errorMessage.append("To Date is Not a valid.");
+							}
+
+							if (errorMessage.length() == 0) {
+								emailIdList.add(emailId);
+								recordsToSave.add(MAPPER.fromStudentDTO(record));
+								recordsSavedCount++;
+							} else {
+								record.setErrorMessage(errorMessage.toString());
+								errorList.add(record);
+							}
+
+							if (recordsToSave.size() % batchSize == 0) { // Use the batch size variable
+								saveRecordsInBatch(recordsToSave);
+								recordsToSave.clear();
+							}
 						}
-						emailIdList.add(emailId);
 					}
-					
-					String dob = dataFormatter.formatCellValue(row.getCell(2));
-					record.setDob(Utility.stringCheck(dob));
-					if(!dob.isEmpty() && !RegexHelper.isDate(dob)) {
-						errorMessage.append("DOB is Not a valid.");
-					}
-					
-					String mobileNumber = dataFormatter.formatCellValue(row.getCell(3));
-					record.setMobileNumber(mobileNumber);
-					if(!mobileNumber.isEmpty() && !RegexHelper.isNumeric(mobileNumber)) {
-						errorMessage.append("Mobile Number is Not a valid.");
-					}
-					
-					String salary = dataFormatter.formatCellValue(row.getCell(4));
-					record.setSalary(salary);
-					if(salary != null && !salary.isEmpty() && !RegexHelper.isDecimal(salary)) {
-						errorMessage.append("Salary is Not a valid.");
-					}
-					
-					String fromDate = dataFormatter.formatCellValue(row.getCell(5));
-					record.setFromDate(Utility.stringCheck(fromDate));
-					if(fromDate != null && !fromDate.isEmpty() && !RegexHelper.isDate(fromDate)) {
-						errorMessage.append("From Date is Not a valid.");
-					}
-					
-					String toDate = dataFormatter.formatCellValue(row.getCell(6));
-					record.setToDate(Utility.stringCheck(toDate));
-					if(toDate != null && !toDate.isEmpty() && !RegexHelper.isDate(toDate)) {
-						errorMessage.append("To Date is Not a valid.");
-					}
-					
-					if(errorMessage.length()==0) {
-						recordsToSave.add(MAPPER.fromStudentDTO(record));
-						recordsSavedCount++;
-					}else {
-						record.setErrorMessage(errorMessage.toString());
-						errorList.add(record);
-					}
-
-					if (recordsToSave.size() % batchSize == 0) { // Use the batch size variable
+					if (!recordsToSave.isEmpty()) {
 						saveRecordsInBatch(recordsToSave);
-						recordsToSave.clear();
 					}
+					result = new Result(errorList);
+					result.setStatusCode(HttpStatus.OK.value());
+					result.setErrorMessage("Number of records failed count : " + errorList.size());
+					result.setSuccessMessage("Number of records saved : " + recordsSavedCount);
+				} else {
+					result = new Result();
+					result.setStatusCode(HttpStatus.BAD_REQUEST.value());
+					result.setErrorMessage("Headers are Mismatched. ");
 				}
+			} else {
+				result = new Result();
+				result.setStatusCode(HttpStatus.BAD_REQUEST.value());
+				result.setErrorMessage("Uploaded Empty Excel Sheet. ");
 			}
 
-			if (!recordsToSave.isEmpty()) {
-				saveRecordsInBatch(recordsToSave);
-			}
-
-			result = new Result(errorList);
-			result.setStatusCode(HttpStatus.OK.value());
-			result.setErrorMessage("Number of records failed count : "+errorList.size());
-			result.setSuccessMessage("Number of records saved : "+recordsSavedCount);
-			
 			long finalTime = System.currentTimeMillis();
 			System.out.println("???>>>???::: TotalTime : " + (finalTime - intialTime));
 

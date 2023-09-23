@@ -138,6 +138,13 @@ public class StudentController {
 		}
 	}
 	
+	/**
+	 * This API is Upload Excel file Records
+	 * 
+	 * @param file
+	 * @return Result response
+	 * @throws ParseException
+	 */
 	@PostMapping(path = "/batch-upload", consumes = { "application/json", "multipart/form-data" })
 	public ResponseEntity<?> uploadExcel(@RequestParam("file") MultipartFile file) throws ParseException {
 		return ResponseEntity.ok(studentService.batchUploadExcel(file));

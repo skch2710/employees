@@ -95,6 +95,16 @@ public class Utility {
 			return null;
 		}
 	}
+	
+	public static String removeCama(String number) {
+		if (number != null && !number.isEmpty()) {
+			// Remove ,
+			String cleanedValue = number.replace(",", "");
+			return cleanedValue;
+		} else {
+			return null;
+		}
+	}
 
 	public static Double numberConvert(BigDecimal value) {
 		if (value != null) {

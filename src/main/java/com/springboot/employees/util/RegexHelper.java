@@ -49,6 +49,10 @@ public class RegexHelper {
 	public static Boolean isAlphaNumeric(String name) {
 		return name != null && name.matches("^[a-zA-Z0-9]*$");
 	}
+	
+	public static Boolean isAlphaNumericSpace(String name) {
+	    return name != null && name.matches("^[a-zA-Z0-9\\s]*$");
+	}
 
 	public static Boolean isAlphaNumericWithSpace(String name) {
 		return name != null && name.matches("^[a-zA-Z0-9\\s]*$");
@@ -61,6 +65,11 @@ public class RegexHelper {
 	public static boolean isDecimal(String number) {
 	    return number != null && number.matches("[-]?[0-9]+([.][0-9]+)?");
 	}
+	
+	public static boolean isDecimalWith(String number) {
+	    return number != null && number.matches("[-]?\\d{1,3}(,\\d{3})*(\\.\\d+)?");
+	}
+
 
 	public static Boolean isDate(String date) {
 		String datePattern = "^(0[1-9]|1[0-2])/(0[1-9]|1\\d|2\\d|3[01])/\\d{4}$";
