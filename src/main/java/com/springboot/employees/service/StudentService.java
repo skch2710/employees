@@ -12,6 +12,8 @@ import com.springboot.employees.dto.StudentDropSearch;
 import com.springboot.employees.dto.StudentSearch;
 
 public interface StudentService {
+	
+	Result getStudentById(Long id);
 
 	Result getStudents(StudentSearch search);
 

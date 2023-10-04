@@ -765,5 +765,27 @@ public class StudentServiceImpl implements StudentService {
 		}
 		return baos;
 	}
+
+	@Override
+	public Result getStudentById(Long id) {
+		Result result = null;
+		try {
+			Student student = studentDAO.findByStudentId(id);
+			
+			if(student !=null) {
+				result = new Result(student);
+				result.setStatusCode(HttpStatus.OK.value());
+				result.setSuccessMessage("SUCCESS");
+			}else {
+				result = new Result();
+				result.setStatusCode(HttpStatus.NOT_FOUND.value());
+				result.setSuccessMessage("NOT FOUND");
+			}
+		} catch (Exception e) {
+			log.error("Error in getStudentById :: ", e);
+			throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return result;
+	}
 	
 }

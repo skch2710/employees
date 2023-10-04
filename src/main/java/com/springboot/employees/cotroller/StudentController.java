@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,13 @@ public class StudentController {
 
 	@Autowired
 	private StudentService studentService;
+	
+	
+	@GetMapping("/findById/{id}")
+	public ResponseEntity<Result> findById(@PathVariable("id") Long id) {
+		Result result = studentService.getStudentById(id);
+		return ResponseEntity.ok(result);
+	}
 
 	/**
 	 * getting Students Details using Native Query
