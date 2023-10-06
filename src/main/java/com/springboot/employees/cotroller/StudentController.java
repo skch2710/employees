@@ -34,6 +34,8 @@ import com.springboot.employees.exception.CustomException;
 import com.springboot.employees.service.StudentService;
 import com.springboot.employees.util.Utility;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 //@RequestMapping("/api/v1/student")
 @RequestMapping("/student")
