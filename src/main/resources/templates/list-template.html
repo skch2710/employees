@@ -1,0 +1,68 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Student as of today Report</title>
+</head>
+
+<body>
+	<table width="100%">
+		<tr>
+			<td colspan="5">
+				<p>Hello,</p>
+				<p>Here is the transmission report of Student as of today</p>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5">
+				<table width="100%">
+
+					<#list reportsList as studentMail>
+						<tr>
+							<td colspan="3">&nbsp;</td>
+						</tr>
+						<tr>
+							<td colspan="3"><strong>${studentMail.sName}</strong></td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								<table width="100%" color="red" border="1">
+									<tr>
+										<th style="background-color:grey">Full Name</th>
+										<th style="background-color:grey">Email ID</th>
+										<th style="background-color:grey">Mobile Number</th>
+									</tr>
+									<#list studentMail.students as student>
+										<tr>
+											<td>${student.fullName}</td>
+											<td>${student.emailId}</td>
+											<td>${student.mobileNumber}</td>
+										</tr>
+									</#list>
+								</table>
+							</td>
+						</tr>
+					</#list>
+
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan=3>&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="5">Thank You,</td>
+		</tr>
+		<tr>
+			<td colspan="5">Sathish CH</td>
+		</tr>
+		<tr>
+			<td colspan="5"><a href="mailto:skch2710@outlook.com">skch2710@outlook.com</a></td>
+		</tr>
+		<tr>
+			<td><img src=${signature} alt="signature" width="200" height="60"></td>
+		</tr>
+	</table>
+</body>
+
+</html>

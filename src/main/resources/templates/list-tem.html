@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Student as of today Report</title>
+	<style>
+		table {
+			width: 80%;
+			border-collapse: collapse;
+		}
+
+		.table-header-cell,td {
+			border: 1px solid black;
+			padding: 5px;
+		}
+
+		.table-header-cell {
+			text-align: left;
+			background-color: grey;
+			font-weight: bold;
+		}
+
+		img {
+			float: left;
+			margin-right: 10px;
+		}
+
+		thead {
+			text-align: left;
+			background-color: transparent;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body>
+	<table width="80%">
+		<thead>
+			<tr>
+				<th colspan="5">Student as of today Report</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th class="table-header-cell">Full Name</th>
+				<th class="table-header-cell">Email ID</th>
+				<th class="table-header-cell">Mobile Number</th>
+			</tr>
+			<#list studentsList as student>
+				<tr>
+					<td>${student.fullName}</td>
+					<td>${student.emailId}</td>
+					<td>${student.mobileNumber}</td>
+				</tr>
+			</#list>
+		</tbody>
+	</table>
+
+	<p>Thank You,</p>
+	<p>Sathish CH</p>
+	<p><a href="mailto:skch2710@outlook.com">skch2710@outlook.com</a></p>
+	<p><img src="cid:signature" alt="signature" width="200" height="60"></p>
+</body>
+
+</html>
