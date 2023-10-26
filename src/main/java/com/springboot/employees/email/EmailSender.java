@@ -75,10 +75,14 @@ public class EmailSender {
 			helper.setText(createTemplate(model.get("htmlFile").toString(), model), true);
 			helper.setSubject(model.get("subject").toString());
 			helper.setFrom(fromEmail, personalMessage);
-			// Add the embedded image signature to the email message.
-			FileSystemResource rsc = new FileSystemResource("src/main/resources/images/image.png");
-			helper.addInline("signature", rsc);
-			if(bos!=null) {
+			
+			if (model.get("isImageSignature").toString().equals("Y")) {
+				// Add the embedded image signature to the email message.
+				FileSystemResource rsc = new FileSystemResource("src/main/resources/images/image.png");
+				helper.addInline("signature", rsc);
+			}
+			
+			if (bos != null) {
 				// Attach the file
 				ByteArrayDataSource dataSource = new ByteArrayDataSource(bos.toByteArray(), model.get("type").toString());
 				helper.addAttachment(model.get("fileName").toString(), dataSource);	
@@ -104,4 +108,9 @@ public class EmailSender {
 	public void sendEmailAttach(Map<String, Object> model,ByteArrayOutputStream bos) {
 		sendEmail(model, bos);
 	}
+	
+//	Map<String, Object> model = new HashMap<>();
+//	model.put("toMail", "skch2710@gmail.com");
+//	model.put("subject", "Welcome to Employee - sathish");
+//	model.put("htmlFile", "temp.html");
 }
