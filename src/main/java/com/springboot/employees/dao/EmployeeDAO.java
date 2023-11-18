@@ -60,6 +60,10 @@ public interface EmployeeDAO extends JpaRepository<Employee, Long> {
 	List<Employee> findAllByOrderByFirstNameAsc();
 	List<Employee> findAllByOrderByFirstNameDesc();
 	
+	List<Employee> findByEmpIdOrderByFirstNameDesc(Long empId);
+	
+	Long countByFirstNameStartsWithOrderByLastNameDesc(String firstName);
+	
 	/**
 	 * + "WHERE (emp_id IN (:empId) OR COALESCE(:empId, 0) = 0)\r\n"
 	 *		+ "  AND (org_id IN (:orgId) OR COALESCE(:orgId, 0) = 0)\r\n"
