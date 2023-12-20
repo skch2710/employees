@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -556,6 +557,7 @@ public class StudentServiceImpl implements StudentService {
 	public Result batchUploadExcel(MultipartFile file) throws ParseException {
 		Result result = null;
 		XSSFWorkbook workbook = null;
+		List<CompletableFuture<Void>> features = new ArrayList<>();
 		try {
 			InputStream inputStream = file.getInputStream();
 			workbook = new XSSFWorkbook(inputStream);
@@ -652,6 +654,10 @@ public class StudentServiceImpl implements StudentService {
 					if (!recordsToSave.isEmpty()) {
 						saveRecordsInBatch(recordsToSave);
 					}
+					
+//					CompletableFuture<Void> allFeatures = CompletableFuture.allOf(features.toArray(new CompletableFuture[0]));
+//					allFeatures.join();
+					
 					result = new Result(errorList);
 					result.setStatusCode(HttpStatus.OK.value());
 					result.setErrorMessage("Number of records failed count : " + errorList.size());
@@ -696,7 +702,35 @@ public class StudentServiceImpl implements StudentService {
 		// Shutdown the executor service when you're done
 		executorService.shutdown();
 	}
-
+	
+	public void saveRecordsInBatch2(List<Student> records,List<CompletableFuture<Void>> features) {
+		System.out.println("Started method....");
+		ExecutorService executorService = Executors.newFixedThreadPool(5); 
+		CompletableFuture<Void> feature = CompletableFuture.runAsync(() -> {
+			try {
+				studentDAO.saveAll(records);
+			} catch (Exception e) {
+				throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		},executorService);
+		features.add(feature);
+	}
+	
+//	private void saveRecordsInBatch2(List<Student> records,List<CompletableFuture<Void>> features) {
+//		features.add(saveAsync(records));
+//	}
+//
+//	public CompletableFuture<Void> saveAsync(List<Student> records) {
+//		System.out.println("Started method....");
+//		return CompletableFuture.runAsync(() -> {
+//			try {
+//				studentDAO.saveAll(records);
+//			} catch (Exception e) {
+//				throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//			}
+//		});
+//	}
+	
 	@Override
 	public ByteArrayOutputStream downloadError(List<StudentDTO> studentDTOs) {
 		SXSSFWorkbook workbook;

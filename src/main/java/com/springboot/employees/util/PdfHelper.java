@@ -66,6 +66,20 @@ public class PdfHelper {
 		return image;
 	}
 
+	public static Image createImage(byte[] imageData) {
+		Image image = null;
+		try {
+			// Create an Image object
+			image = Image.getInstance(imageData);
+			image.setAlignment(Image.ALIGN_CENTER);
+			// Set position and size of the image
+			image.scalePercent(30f);
+		} catch (Exception e) {
+			log.error("error in createImage", e);
+		}
+		return image;
+	}
+	
 	public static PdfPTable createTable(int size, float spacingBefore, float spacingAfter, int width) {
 		PdfPTable table = new PdfPTable(size);
 		table.setSpacingBefore(spacingBefore);
